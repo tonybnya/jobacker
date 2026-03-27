@@ -1,6 +1,11 @@
 # Created by https://www.toptal.com/developers/gitignore/api/react,python
 # Edit at https://www.toptal.com/developers/gitignore?templates=react,python
 
+ROADMAP.md
+12-api-design-best-practices.jpg
+spec.md
+favicon*
+
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/

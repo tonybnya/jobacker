@@ -24,13 +24,13 @@ class Settings(BaseSettings):
 
     # Database Configuration
     # SQLite for development, Neon PostgreSQL for production
-    DATABASE_URL: str = Field(
+    DEV_DATABASE_URL: str = Field(
         default="sqlite:///./jobs.db",
         description="Database URL (SQLite for dev, Neon PostgreSQL for prod)",
     )
 
     # Neon PostgreSQL (Production)
-    NEON_DATABASE_URL: Optional[str] = Field(
+    PROD_DATABASE_URL: Optional[str] = Field(
         default=None,
         description="Neon PostgreSQL connection URL",
     )
@@ -98,9 +98,9 @@ class Settings(BaseSettings):
         Return the effective database URL.
         Uses Neon in production if available, otherwise SQLite.
         """
-        if self.NEON_DATABASE_URL:
-            return self.NEON_DATABASE_URL
-        return self.DATABASE_URL
+        if self.PROD_DATABASE_URL:
+            return self.PROD_DATABASE_URL
+        return self.DEV_DATABASE_URL
 
     @property
     def effective_redis_url(self) -> str:
@@ -115,7 +115,7 @@ class Settings(BaseSettings):
     @property
     def is_production(self) -> bool:
         """Check if running in production mode."""
-        return self.NEON_DATABASE_URL is not None
+        return self.PROD_DATABASE_URL is not None
 
 
 @lru_cache()

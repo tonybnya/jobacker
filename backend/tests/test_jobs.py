@@ -35,7 +35,7 @@ class TestJobApplications:
             headers=test_user["headers"]
         )
         assert response.status_code == status.HTTP_201_CREATED
-        
+
         data = response.json()
         assert data["role"] == sample_job_data["role"]
         assert data["company"] == sample_job_data["company"]
@@ -44,10 +44,10 @@ class TestJobApplications:
     def test_list_jobs_success(self, client, test_user, sample_job_data):
         """Test listing jobs with pagination."""
         client.post("/api/v1/jobs/", json=sample_job_data, headers=test_user["headers"])
-        
+
         response = client.get("/api/v1/jobs/", headers=test_user["headers"])
         assert response.status_code == status.HTTP_200_OK
-        
+
         data = response.json()
         assert "data" in data
         assert "pagination" in data
@@ -60,7 +60,7 @@ class TestJobStatistics:
         """Test getting job statistics."""
         response = client.get("/api/v1/jobs/stats", headers=test_user["headers"])
         assert response.status_code == status.HTTP_200_OK
-        
+
         data = response.json()
         assert "total_applications" in data
         assert "by_stage" in data

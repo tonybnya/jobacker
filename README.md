@@ -1,10 +1,10 @@
 
-# JobPipeline - Job Tracker
+# Jobacker - Job Tracker
 
 > **Note:** This is a temporary README. The application is currently ongoing.
 
 ## Overview
-JobPipeline is a high-ticket job funnel tracker built to help job seekers organize, track, and optimize their job application process. 
+Jobacker is a high-ticket job funnel tracker built to help job seekers organize, track, and optimize their job application process. 
 
 ## Upcoming Tech Stack
 The new architecture will utilize a modern web stack designed for performance, maintainability, and smooth animations:

@@ -32,7 +32,7 @@ limiter = Limiter(key_func=get_remote_address)
 
 # Create FastAPI app with API versioning
 app = FastAPI(
-    title="JobPipeline API",
+    title="Jobacker API",
     description="A job application tracker API following 12 best practices",
     version="1.0.0",
     prefix="/api/v1",
@@ -101,7 +101,7 @@ async def root():
     Root endpoint - redirects to API documentation.
     """
     return {
-        "message": "Welcome to JobPipeline API",
+        "message": "Welcome to Jobacker API",
         "documentation": "/docs",
         "version": "v1.0.0",
     }

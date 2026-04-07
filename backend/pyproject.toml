@@ -1,7 +1,7 @@
 [project]
-name = "JobPipeline"
+name = "Jobacker"
 version = "1.0.0"
-description = "Job Application Tracker - FastAPI Backend"
+description = "Jobacker - FastAPI Backend"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

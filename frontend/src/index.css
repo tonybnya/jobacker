@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+@theme {
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+  --font-sans: system-ui, sans-serif;
+
+  --color-bg: #1C1917;
+  --color-surface: rgba(28, 25, 23, 0.6);
+  --color-surface-light: rgba(68, 64, 60, 0.2);
+  --color-surface-solid: #44403C;
+
+  --color-border: #292524;
+  --color-border-amber: #F59E0B;
+
+  --color-text: #D6D3D1;
+  --color-text-muted: #78716C;
+  --color-text-dim: #44403C;
+
+  --color-primary: #451A03;
+  --color-amber: #F59E0B;
+  --color-gold: #FBBF24;
+
+  --color-foreground: #0C0A09;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+}
+
+html {
+  background-color: #1C1917;
+}
+
+body {
+  background-color: #1C1917;
+  color: #D6D3D1;
+  font-family: system-ui, sans-serif;
+}
+
+.glass {
+  background: rgba(28, 25, 23, 0.6);
+  border: 1px solid rgba(41, 37, 36, 0.6);
+  backdrop-filter: blur(12px);
+}
+
+.glass-light {
+  background: rgba(68, 64, 60, 0.2);
+  border: 1px solid rgba(41, 37, 36, 0.4);
+  backdrop-filter: blur(8px);
+}
+
+.gradient-shell {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(41, 37, 36, 0.4) 50%, rgba(251, 191, 36, 0.08) 100%);
+  border-radius: 14px;
+  padding: 1px;
+}
+
+.gradient-shell > .glass {
+  border-radius: 11px;
+}
+
+.gradient-shell > .glass-light {
+  border-radius: 11px;
+}
+
+.text-gradient {
+  background: linear-gradient(to right, #FBBF24, #F59E0B, #D97706);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.03;
+  pointer-events: none;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes pulse-amber {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+@keyframes ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-blink {
+  animation: blink 1.2s step-end infinite;
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-pulse-amber {
+  animation: pulse-amber 2s ease-in-out infinite;
+}

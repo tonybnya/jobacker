@@ -7,8 +7,8 @@ Update this file after every completed feature. Any AI agent reading this should
 ## Current Status
 
 **Phase:** Phase 0 — Project Setup
-**Last completed:** Landing page reference design (pre-build, already complete)
-**Next:** 00 Project Scaffolding
+**Last completed:** 00 Project Scaffolding (frontend scaffold + landing page converted)
+**Next:** Phase 1 — Foundation (01 Auth)
 
 ---
 
@@ -20,7 +20,7 @@ Update this file after every completed feature. Any AI agent reading this should
 
 ### Phase 0 — Project Setup
 
-- [ ] 00 Project Scaffolding
+- [x] 00 Project Scaffolding — Vite + React + TypeScript setup, Tailwind v4 with design tokens, path aliases, cn() utility, JetBrains Mono font, landing page converted to React components (AmbientCanvas, HeroSketch, Navbar, Features, StatsBar, TickerLine, Footer, LandingPage)
 
 ### Phase 1 — Foundation
 
@@ -71,3 +71,4 @@ Update this file after every completed feature. Any AI agent reading this should
 - If a feature required a package not in the approved list in `code-standards.md`, document it here with the reason.
 - If an InsForge schema change was made during a feature (column added, type changed), document it here so subsequent features know the current shape.
 - If HugeIcons icon names differ from what's referenced in component plans (icon names vary by package version), document the exact names used here for consistency across future features.
+- hugeicons-react v0.4.0 exports icons individually via `import { IconName } from "hugeicons-react"` — ArrowRightIcon is actually ArrowRight01Icon, other icons match their documented names.

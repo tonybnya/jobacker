@@ -1,9 +1,12 @@
-function App() {
+import { BrowserRouter, Routes, Route } from "react-router-dom"
+import LandingPage from "@/pages/LandingPage"
+
+export default function App() {
   return (
-    <div className="min-h-screen">
-      <p>Jobacker</p>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
-
-export default App

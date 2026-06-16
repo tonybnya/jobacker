@@ -69,10 +69,10 @@ All animated elements use CSS class selectors (`.sketch-path`, `.sketch-circle`,
 
 ---
 
-### Nav
+### Nav (Landing Page)
 
-File: `src/App.tsx` → `function Nav()`
-Last updated: 2026-06-09
+File: `src/components/Navbar.tsx`
+Last updated: 2026-06-16
 
 | Property       | Class / Value                                                                          |
 | -------------- | -------------------------------------------------------------------------------------- |
@@ -95,8 +95,8 @@ Scroll detection uses a boolean state, not a class toggle on the element. The `t
 
 ### Hero
 
-File: `src/App.tsx` → `function Hero()`
-Last updated: 2026-06-09
+File: `src/pages/LandingPage.tsx` (inline in page component)
+Last updated: 2026-06-16
 
 | Property        | Class / Value                                                                               |
 | --------------- | ------------------------------------------------------------------------------------------- |
@@ -120,8 +120,8 @@ The hero is the only section with `min-h-screen`. The two-column layout collapse
 
 ### Terminal Block
 
-File: `src/App.tsx` → inside `Hero()`
-Last updated: 2026-06-09
+File: `src/pages/LandingPage.tsx` (inline in hero section)
+Last updated: 2026-06-16
 
 | Property        | Class / Value                                                                     |
 | --------------- | --------------------------------------------------------------------------------- |
@@ -144,8 +144,8 @@ Last updated: 2026-06-09
 
 ### TickerLine
 
-File: `src/App.tsx` → `function TickerLine()`
-Last updated: 2026-06-09
+File: `src/components/TickerLine.tsx`
+Last updated: 2026-06-16
 
 | Property     | Class / Value                                                                           |
 | ------------ | --------------------------------------------------------------------------------------- |
@@ -163,8 +163,8 @@ The ticker sits between the hero and the stats bar — it is a section divider, 
 
 ### StatsBar
 
-File: `src/App.tsx` → `function StatsBar()`
-Last updated: 2026-06-09
+File: `src/components/StatsBar.tsx`
+Last updated: 2026-06-16
 
 | Property      | Class / Value                                                                       |
 | ------------- | ----------------------------------------------------------------------------------- |
@@ -182,8 +182,8 @@ Four stats: always `grid-cols-2` on mobile, `grid-cols-4` on desktop. `divide-x`
 
 ### Features Grid
 
-File: `src/App.tsx` → `function Features()`
-Last updated: 2026-06-09
+File: `src/components/Features.tsx`
+Last updated: 2026-06-16
 
 | Property      | Class / Value                                                                                |
 | ------------- | -------------------------------------------------------------------------------------------- |
@@ -205,8 +205,8 @@ Each card uses the `gradient-shell` outer wrapper for the amber edge-glow treatm
 
 ### HowItWorks
 
-File: `src/App.tsx` → `function HowItWorks()`
-Last updated: 2026-06-09
+File: `src/pages/LandingPage.tsx` (inline in page component)
+Last updated: 2026-06-16
 
 | Property         | Class / Value                                                                            |
 | ---------------- | ---------------------------------------------------------------------------------------- |
@@ -227,8 +227,8 @@ The connector line is a sibling element to the step number shell inside the `fle
 
 ### Score Card Mockup
 
-File: `src/App.tsx` → inside `HowItWorks()`
-Last updated: 2026-06-09
+File: `src/pages/LandingPage.tsx` (inline inside HowItWorks section)
+Last updated: 2026-06-16
 
 | Property        | Class / Value                                                                           |
 | --------------- | --------------------------------------------------------------------------------------- |
@@ -252,8 +252,8 @@ Score ring circumference math: `2 * Math.PI * 34 * (score / 100)` for the filled
 
 ### Pipeline
 
-File: `src/App.tsx` → `function Pipeline()`
-Last updated: 2026-06-09
+File: `src/pages/LandingPage.tsx` (inline in page component)
+Last updated: 2026-06-16
 
 | Property       | Class / Value                                                                           |
 | -------------- | --------------------------------------------------------------------------------------- |
@@ -288,8 +288,8 @@ Score bar fill color is set via inline `style={{ background: col.color }}` not a
 
 ### CTA Section
 
-File: `src/App.tsx` → `function CTA()`
-Last updated: 2026-06-09
+File: `src/pages/LandingPage.tsx` (inline in page component)
+Last updated: 2026-06-16
 
 | Property      | Class / Value                                                                           |
 | ------------- | --------------------------------------------------------------------------------------- |
@@ -310,8 +310,8 @@ The CTA section has no card wrapper — it sits directly on the page background.
 
 ### Footer
 
-File: `src/App.tsx` → `function Footer()`
-Last updated: 2026-06-09
+File: `src/components/Footer.tsx`
+Last updated: 2026-06-16
 
 | Property      | Class / Value                                                                           |
 | ------------- | --------------------------------------------------------------------------------------- |

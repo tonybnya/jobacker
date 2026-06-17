@@ -61,7 +61,7 @@ export function HeroSection() {
                 <div className="flex items-center gap-2 glass px-3 py-1.5 rounded-full">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber animate-pulse-amber" />
                   <span className="text-[10px] font-mono tracking-widest text-text-muted uppercase">
-                    AI-Powered Job Tracker
+                    AI-Powered Job Application Tracker
                   </span>
                 </div>
               </div>

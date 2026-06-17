@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import logo from '@/assets/logo.png'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -421,7 +422,7 @@ export function CTASection() {
           Stop applying blind.
         </h2>
         <p className="text-sm text-text-muted mb-10 max-w-sm mx-auto font-light leading-relaxed">
-          Join developers taking the guesswork out of the job hunt with AI-powered preparation and tracking.
+          Join developers taking the guesswork out of the job hunt with a reliable AI-powered job application tracking system.
         </p>
         <div className="flex items-center justify-center gap-4 flex-wrap">
           <button className="group flex items-center gap-2 bg-[#F5F5F4] text-foreground text-sm font-mono font-medium px-8 py-3.5 rounded-lg hover:bg-white transition-all hover:shadow-[0_0_40px_rgba(245,158,11,0.25)]">
@@ -442,21 +443,11 @@ export function LandingFooter() {
     <footer className="border-t border-border py-8">
       <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-2">
-          <div className="w-5 h-5 rounded bg-amber flex items-center justify-center">
-            <svg viewBox="0 0 24 24" fill="none" className="w-3 h-3">
-              <path
-                d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
-                stroke="var(--color-bg)"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </div>
-          <span className="text-xs font-mono text-text-muted">JOBACKER &mdash; Alpha Release</span>
+          <img src={logo} alt="Jobacker" className="w-6 h-6 rounded object-cover" />
+          <span className="text-xs font-mono text-text-muted">JOBACKER</span>
         </div>
         <div className="flex items-center gap-6">
-          {['Privacy', 'Terms', 'Changelog', 'GitHub'].map((item) => (
+          {['Privacy', 'Terms', 'GitHub'].map((item) => (
             <a
               key={item}
               href="#"

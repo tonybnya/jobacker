@@ -20,12 +20,9 @@ export function LandingNav() {
         <div className="flex items-center gap-2">
           <img src={logo} alt="Jobacker" className="w-6 h-6 rounded object-cover" />
           <span className="font-mono text-sm font-semibold tracking-tight text-text">JOBACKER</span>
-          <span className="ml-1 text-[9px] font-mono px-1.5 py-0.5 rounded border border-amber/30 text-amber tracking-widest">
-            ALPHA
-          </span>
         </div>
         <div className="hidden md:flex items-center gap-8">
-          {['Features', 'How it works', 'Pricing', 'Changelog'].map((item) => (
+          {['Features', 'How it works'].map((item) => (
             <a
               key={item}
               href="#"

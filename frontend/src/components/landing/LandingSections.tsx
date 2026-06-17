@@ -202,7 +202,7 @@ export function HowItWorksSection() {
                   <div className="w-8 h-8 rounded-lg glass flex items-center justify-center shrink-0 group-hover:border-border-amber/40 transition-colors">
                     <span className="text-[10px] font-mono text-amber">{s.n}</span>
                   </div>
-                  {i < steps.length - 1 && <div className="w-px flex-1 bg-border my-1 min-h-[32px]" />}
+                  {i < steps.length - 1 && <div className="w-px flex-1 bg-border my-1 min-h-8" />}
                 </div>
                 <div className="pb-6">
                   <h3 className="text-sm font-medium text-text mb-1">{s.title}</h3>
@@ -255,7 +255,7 @@ export function HowItWorksSection() {
                       </div>
                       <div className="h-1 rounded-full bg-border">
                         <div
-                          className="h-full rounded-full bg-gradient-to-r from-amber to-gold"
+                          className="h-full rounded-full bg-linear-to-r from-amber to-gold"
                           style={{ width: `${item.val}%` }}
                         />
                       </div>
@@ -417,7 +417,7 @@ export function CTASection() {
   return (
     <section className="py-32">
       <div className="max-w-7xl mx-auto px-6 text-center" ref={ref}>
-        <span className="text-[10px] font-mono tracking-widest text-text-muted block mb-4">// START_NOW</span>
+        <span className="text-[10px] font-mono tracking-widest text-amber block mb-4">// START_NOW</span>
         <h2 className="text-5xl md:text-6xl font-light text-text mb-4" style={{ letterSpacing: '-0.025em' }}>
           Stop applying blind.
         </h2>
@@ -429,7 +429,7 @@ export function CTASection() {
             Create free account{' '}
             <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>
           </button>
-          <span className="text-[10px] font-mono text-text-dim">No credit card required</span>
+          <span className="text-[10px] font-mono text-amber">No credit card required</span>
         </div>
       </div>
     </section>

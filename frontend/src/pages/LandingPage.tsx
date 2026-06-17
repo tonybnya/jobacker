@@ -15,7 +15,7 @@ gsap.registerPlugin(ScrollTrigger)
 
 export default function LandingPage() {
   return (
-    <div className="relative bg-[#1C1917] min-h-screen">
+    <div className="relative bg-bg min-h-screen">
       <LandingNav />
       <HeroSection />
       <StatsBar />

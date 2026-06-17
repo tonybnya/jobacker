@@ -86,7 +86,7 @@ export function HeroSection() {
 
               <p ref={subRef} className="text-sm text-text-muted leading-relaxed max-w-md font-light">
                 Jobacker is your AI-powered co-pilot for the job hunt. Score your resume against any job description,
-                generate tailored cover letters, and track every application — all in one place.
+                generate tailored cover letters, and track every application <span className="text-gradient">•</span> All in one place.
               </p>
 
               <div ref={ctaRowRef} className="flex items-center gap-4">
@@ -134,7 +134,7 @@ export function HeroSection() {
             </div>
 
             <div className="relative flex items-center justify-center">
-              <div className="relative w-full max-w-lg aspect-[7/6]">
+              <div className="relative w-full max-w-lg aspect-7/6">
                 <div
                   className="absolute inset-0 rounded-2xl"
                   style={{ background: 'radial-gradient(ellipse at 40% 50%, rgba(69,26,3,0.4) 0%, transparent 70%)' }}

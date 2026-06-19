@@ -22,23 +22,32 @@ export function LandingNav() {
           <span className="font-mono text-sm font-semibold tracking-tight text-text">JOBACKER</span>
         </div>
         <div className="hidden md:flex items-center gap-8">
-          {['Features', 'How it works'].map((item) => (
-            <a
-              key={item}
-              href="#"
-              className="text-xs text-text-muted hover:text-text transition-colors tracking-wide font-mono"
-            >
-              {item}
-            </a>
-          ))}
+          {['Features', 'How it works'].map((item) => {
+            const anchor = item.toLowerCase().replace(/\s+/g, '-')
+            return (
+              <a
+                key={item}
+                href={`/#${anchor}`}
+                className="cursor-pointer text-xs text-text-muted hover:text-text transition-colors tracking-wide font-mono"
+              >
+                {item}
+              </a>
+            )
+          })}
         </div>
         <div className="flex items-center gap-3">
-          <button className="text-xs font-mono text-text px-4 py-2 rounded-full hover:text-white transition-colors">
+          <a
+            href="/login"
+            className="cursor-pointer text-xs font-mono text-text px-4 py-2 rounded-full hover:text-white transition-colors"
+          >
             Sign in
-          </button>
-          <button className="text-xs font-mono bg-[#F5F5F4] text-foreground px-4 py-2 rounded-lg font-medium hover:bg-white transition-colors">
+          </a>
+          <a
+            href="/login?mode=signup"
+            className="cursor-pointer text-xs font-mono bg-[#F5F5F4] text-foreground px-4 py-2 rounded-lg font-medium hover:bg-white transition-colors"
+          >
             Get started &rarr;
-          </button>
+          </a>
         </div>
       </div>
     </nav>

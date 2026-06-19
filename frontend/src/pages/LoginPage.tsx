@@ -105,7 +105,7 @@ export function LoginPage() {
             <button
               type="submit"
               disabled={busy}
-              className="mt-1 w-full rounded-lg bg-[#F5F5F4] px-4 py-2.5 font-mono text-[12px] font-medium text-foreground transition-shadow hover:shadow-[0_0_24px_rgba(245,158,11,0.2)] disabled:opacity-50"
+              className="cursor-pointer mt-1 w-full rounded-lg bg-[#F5F5F4] px-4 py-2.5 font-mono text-[12px] font-medium text-foreground transition-shadow hover:shadow-[0_0_24px_rgba(245,158,11,0.2)] disabled:opacity-50"
             >
               {busy ? "..." : mode === "signin" ? "Sign In" : "Create Account"}
             </button>
@@ -121,7 +121,7 @@ export function LoginPage() {
             <button
               type="button"
               onClick={() => handleOAuth("google")}
-              className="flex items-center justify-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 font-mono text-[12px] text-text transition-colors hover:border-border-amber/30"
+              className="cursor-pointer flex items-center justify-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 font-mono text-[12px] text-text transition-colors hover:border-border-amber/30"
             >
               <GoogleIcon size={16} />
               Continue with Google
@@ -129,7 +129,7 @@ export function LoginPage() {
             <button
               type="button"
               onClick={() => handleOAuth("github")}
-              className="flex items-center justify-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 font-mono text-[12px] text-text transition-colors hover:border-border-amber/30"
+              className="cursor-pointer flex items-center justify-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 font-mono text-[12px] text-text transition-colors hover:border-border-amber/30"
             >
               <GithubIcon size={16} />
               Continue with GitHub
@@ -143,7 +143,7 @@ export function LoginPage() {
                 <button
                   type="button"
                   onClick={() => { setMode("signup"); setError(null); setMessage(null); }}
-                  className="text-amber underline underline-offset-2"
+                  className="cursor-pointer text-amber underline underline-offset-2"
                 >
                   Sign up
                 </button>
@@ -154,7 +154,7 @@ export function LoginPage() {
                 <button
                   type="button"
                   onClick={() => { setMode("signin"); setError(null); setMessage(null); }}
-                  className="text-amber underline underline-offset-2"
+                  className="cursor-pointer text-amber underline underline-offset-2"
                 >
                   Sign in
                 </button>

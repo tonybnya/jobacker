@@ -108,7 +108,7 @@ export function FeaturesSection() {
   }, [])
 
   return (
-    <section className="py-24 border-b border-border">
+    <section id="features" className="py-24 border-b border-border">
       <div ref={ref} className="max-w-7xl mx-auto px-6">
         <div className="mb-12">
           <span className="text-[10px] font-mono tracking-widest text-amber block mb-3">// CAPABILITIES</span>
@@ -187,7 +187,7 @@ export function HowItWorksSection() {
   const circumference = 2 * Math.PI * 34
 
   return (
-    <section className="py-24 border-b border-border">
+    <section id="how-it-works" className="py-24 border-b border-border">
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         <div ref={ref}>
           <span className="text-[10px] font-mono tracking-widest text-amber block mb-3">// WORKFLOW</span>
@@ -425,10 +425,13 @@ export function CTASection() {
           Join developers taking the guesswork out of the job hunt with a reliable AI-powered job application tracking system.
         </p>
         <div className="flex items-center justify-center gap-4 flex-wrap">
-          <button className="group flex items-center gap-2 bg-[#F5F5F4] text-foreground text-sm font-mono font-medium px-8 py-3.5 rounded-lg hover:bg-white transition-all hover:shadow-[0_0_40px_rgba(245,158,11,0.25)]">
+          <a
+            href="/login?mode=signup"
+            className="cursor-pointer group inline-flex items-center gap-2 bg-[#F5F5F4] text-foreground text-sm font-mono font-medium px-8 py-3.5 rounded-lg hover:bg-white transition-all hover:shadow-[0_0_40px_rgba(245,158,11,0.25)]"
+          >
             Create free account{' '}
             <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>
-          </button>
+          </a>
           <span className="text-[10px] font-mono text-amber">No credit card required</span>
         </div>
       </div>
@@ -450,7 +453,9 @@ export function LandingFooter() {
           {['Privacy', 'Terms', 'GitHub'].map((item) => (
             <a
               key={item}
-              href="#"
+              href={item === 'GitHub' ? 'https://github.com/tonybnya/jobacker' : '#'}
+              target={item === 'GitHub' ? '_blank' : undefined}
+              rel={item === 'GitHub' ? 'noopener noreferrer' : undefined}
               className="text-[11px] font-mono text-text-dim hover:text-text-muted transition-colors"
             >
               {item}

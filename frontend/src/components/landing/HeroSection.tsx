@@ -90,11 +90,14 @@ export function HeroSection() {
               </p>
 
               <div ref={ctaRowRef} className="flex items-center gap-4">
-                <button className="group flex items-center gap-2 bg-[#F5F5F4] text-foreground text-xs font-mono font-medium px-5 py-3 rounded-lg hover:bg-white transition-all hover:shadow-[0_0_24px_rgba(245,158,11,0.2)]">
+                <a
+                  href="/login?mode=signup"
+                  className="cursor-pointer group inline-flex items-center gap-2 bg-[#F5F5F4] text-foreground text-xs font-mono font-medium px-5 py-3 rounded-lg hover:bg-white transition-all hover:shadow-[0_0_24px_rgba(245,158,11,0.2)]"
+                >
                   Start tracking free{' '}
                   <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>
-                </button>
-                <button className="flex items-center gap-2 text-xs font-mono text-text px-4 py-2.5 rounded-full glass hover:border-border-amber/30 transition-all">
+                </a>
+                <button className="cursor-pointer flex items-center gap-2 text-xs font-mono text-text px-4 py-2.5 rounded-full glass hover:border-border-amber/30 transition-all">
                   <span className="w-4 h-4 rounded-full border border-text-muted flex items-center justify-center">
                     <span className="w-0 h-0 border-t-[3px] border-t-transparent border-b-[3px] border-b-transparent border-l-[5px] border-l-text ml-0.5" />
                   </span>

@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { DashboardSquare01Icon, UserIcon, Folder01Icon, AnalysisTextLinkIcon, Logout05Icon } from "hugeicons-react";
+import logo from "@/assets/logo.png";
 
 export function Navbar() {
   const { user, signOut } = useAuth();
@@ -15,7 +16,8 @@ export function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-surface backdrop-blur-xl">
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-6">
         <Link to="/" className="flex items-center gap-2">
-          <span className="font-mono text-sm font-medium text-gold">JOBACKER</span>
+          <img src={logo} alt="Jobacker" className="h-6 w-6 rounded object-cover" />
+          <span className="font-mono text-sm font-semibold tracking-tight text-text">JOBACKER</span>
         </Link>
 
         {user ? (
@@ -50,7 +52,7 @@ export function Navbar() {
             </Link>
             <button
               onClick={handleSignOut}
-              className="flex items-center gap-1.5 rounded-full px-3 py-1.5 font-mono text-[11px] text-text-muted transition-colors hover:text-text"
+              className="cursor-pointer flex items-center gap-1.5 rounded-full px-3 py-1.5 font-mono text-[11px] text-text-muted transition-colors hover:text-text"
             >
               <Logout05Icon size={14} />
               Sign Out
@@ -60,7 +62,7 @@ export function Navbar() {
           <div className="flex items-center gap-2">
             <Link
               to="/login"
-              className="rounded-full border border-border bg-surface px-4 py-1.5 font-mono text-[11px] text-text transition-colors hover:border-border-amber/30"
+              className="cursor-pointer rounded-full border border-border bg-surface px-4 py-1.5 font-mono text-[11px] text-text transition-colors hover:border-border-amber/30"
             >
               Sign In
             </Link>

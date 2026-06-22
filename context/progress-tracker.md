@@ -6,9 +6,9 @@ Update this file after every completed feature. Any AI agent reading this should
 
 ## Current Status
 
-**Phase:** Phase 1 — Foundation
-**Last completed:** 02 Database Schema (4 InsForge tables + storage bucket + RLS + triggers + OAuth redirect URLs)
-**Next:** Phase 2 — Profile Page (03 Profile Page — Full UI)
+**Phase:** Phase 2 — Profile Page
+**Last completed:** 04 Profile Save Logic + Resume Upload (backend GET/PUT/POST /resume routes, useProfile hook, wired ProfilePage, ResumeUpload with actual upload)
+**Next:** Phase 3 — Applications (05 Applications Page — Full UI)
 
 ---
 
@@ -29,8 +29,8 @@ Update this file after every completed feature. Any AI agent reading this should
 
 ### Phase 2 — Profile Page
 
-- [ ] 03 Profile Page — Full UI
-- [ ] 04 Profile Save Logic + Resume Upload
+- [x] 03 Profile Page — Full UI (ProfilePage, ProfileForm, ResumeUpload, CompletionBanner components)
+- [x] 04 Profile Save Logic + Resume Upload (GET /api/profile, PUT /api/profile, POST /api/profile/resume with multer + pdf-parse + InsForge Storage, useProfile hook)
 
 ### Phase 3 — Applications
 
@@ -81,3 +81,9 @@ Update this file after every completed feature. Any AI agent reading this should
 - If an InsForge schema change was made during a feature (column added, type changed), document it here so subsequent features know the current shape.
 - If HugeIcons icon names differ from what's referenced in component plans (icon names vary by package version), document the exact names used here for consistency across future features.
 - hugeicons-react v0.4.0 exports icons individually via `import { IconName } from "hugeicons-react"` — ArrowRightIcon is actually ArrowRight01Icon, other icons match their documented names.
+- pdf-parse v2.4.5 uses `PDFParse` class (ESM named export), not default export. Constructor takes `{ data: Uint8Array }`, text extraction via `getText()` returns `TextResult` with `.text` property.
+- InsForge SDK `setAuthToken()` exists at runtime but TypeScript types don't expose it — use raw fetch to the InsForge Storage API and PostgREST API with user's Bearer token instead.
+- PostgREST endpoint: `{INSFORGE_URL}/api/database/v1/profiles?user_id=eq.{userId}`. PATCH with `Prefer: return=representation` header to get updated row back.
+- Storage upload endpoint: `PUT {INSFORGE_URL}/api/storage/buckets/resumes/objects/{encodedKey}` with FormData body.
+- No loader/spinner icons in hugeicons-react v0.4.0 — use inline SVG spinner animation (`animate-spin` Tailwind class with circle + path).
+- Profile page uses edit/save/cancel toggle pattern with local form state.

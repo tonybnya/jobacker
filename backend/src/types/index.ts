@@ -17,3 +17,15 @@ export type ApplicationType =
 export type SpyStatus = "unseen" | "opened";
 
 export type ImprovementTag = "ADD" | "REPHRASE" | "FORMAT";
+
+export type Profile = {
+  id: string;
+  full_name: string | null;
+  email: string | null;
+  phone: string | null;
+  location: string | null;
+  resume_pdf_url: string | null;
+  resume_text: string | null;
+  created_at: string;
+  updated_at: string;
+};

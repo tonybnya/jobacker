@@ -329,6 +329,72 @@ The CTA section has no card wrapper — it sits directly on the page background.
 
 ---
 
+### ProfilePage
+
+File: `src/pages/ProfilePage.tsx`
+Last updated: 2026-06-22
+
+| Property      | Class / Value                                                                                       |
+| ------------- | --------------------------------------------------------------------------------------------------- |
+| Outer         | `mx-auto max-w-2xl px-4 py-8`                                                                      |
+| Header row    | `flex items-center justify-between mb-8` — title + edit button                                     |
+| Title         | `text-xl font-medium text-text`                                                                    |
+| Subtitle      | `mt-1 text-xs text-text-muted`                                                                     |
+| Edit button   | `rounded-lg border border-border bg-surface px-4 py-2 text-xs text-text hover:border-amber hover:text-amber` |
+| Form section  | `glass divide-y divide-border` with `px-5 py-5` padding for inner content                          |
+| Label         | `mb-1.5 text-xs font-medium text-text-muted`                                                       |
+| Input         | `w-full rounded-lg border bg-surface px-4 py-2.5 text-sm text-text outline-none placeholder:text-text-dim focus:border-amber` |
+| Read-only     | Same classes + `cursor-default text-text-dim` + `border-border` (no focus)                         |
+| Editing input | `border-amber/40` (visible amber border to indicate editable)                                       |
+| Save button   | `rounded-lg bg-amber px-5 py-2 text-xs font-medium text-primary hover:opacity-90`                  |
+| Spinner       | Inline SVG with `animate-spin` — no hugeicons-react spinner icon exists in v0.4.0                   |
+
+**Pattern notes:**
+Edit button toggles editing state — form fields switch between read-only and editable. Email is always read-only (pre-filled from auth). The form state is local (useState) and saved via `saveProfile` callback. Profile loads via `useProfile` hook which calls `GET /api/profile` on mount.
+
+---
+
+### CompletionBanner
+
+File: `src/components/profile/CompletionBanner.tsx`
+Last updated: 2026-06-22
+
+| Property        | Class / Value                                                                  |
+| --------------- | ------------------------------------------------------------------------------ |
+| Container       | `gradient-shell` wrapper (when incomplete) or `glass-light` (when complete)    |
+| Icon/wrapper    | `flex h-8 w-8 items-center justify-center rounded-full bg-amber/10`           |
+| Icon            | `AlertCircleIcon` from hugeicons-react — `h-4 w-4 text-amber` (incomplete)     |
+| Title           | `text-sm font-medium` — `text-amber` (incomplete) or `text-text` (complete)   |
+| Body            | `mt-1 text-xs text-text-muted`                                                 |
+
+**Pattern notes:**
+Renders two states based on `hasResume` prop. Incomplete state uses `gradient-shell` for the amber glow emphasis. Complete state uses `glass-light` with a green check indicator. Banner sits between the page header and form cards.
+
+---
+
+### ResumeUpload
+
+File: `src/components/profile/ResumeUpload.tsx`
+Last updated: 2026-06-22
+
+| Property       | Class / Value                                                                  |
+| -------------- | ------------------------------------------------------------------------------ |
+| Drop zone      | `rounded-xl border-2 border-dashed p-10 text-center cursor-pointer`            |
+| Default border | `border-border hover:border-text-muted`                                        |
+| Active border  | `border-amber bg-amber/5` (on drag over)                                       |
+| Uploading      | `border-amber/40 opacity-60` (disabled state)                                  |
+| Icon container | `mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-surface-light` |
+| Icon           | `FileUploadIcon` from hugeicons-react — `h-5 w-5 text-text-muted`              |
+| Uploading icon | Inline SVG spinner with `animate-spin text-amber`                              |
+| Success text   | `mb-3 flex items-center gap-2 text-xs text-emerald-400` with `CheckmarkCircle01Icon` |
+| CTA text       | `text-sm text-text` with `<span class="text-amber">Click to upload</span>`     |
+| Hint           | `mt-1 text-xs text-text-muted` — "PDF only, max 10MB"                          |
+
+**Pattern notes:**
+Clicking the drop zone opens the file picker. Drag-and-drop sets file state AND triggers onUpload immediately. The upload state is driven externally via the `uploading` and `onUpload` props from `useProfile`. Existing uploaded state shown via emerald checkmark + "Current resume uploaded" text when `currentUrl` is set.
+
+---
+
 ### Footer
 
 File: `src/components/Footer.tsx`

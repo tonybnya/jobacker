@@ -6,9 +6,9 @@ Update this file after every completed feature. Any AI agent reading this should
 
 ## Current Status
 
-**Phase:** Phase 0 — Project Setup
-**Last completed:** 00 Project Scaffolding (frontend scaffold + landing page converted)
-**Next:** Phase 1 — Foundation (01 Auth)
+**Phase:** Phase 1 — Foundation
+**Last completed:** 02 Database Schema (4 InsForge tables + storage bucket + RLS + triggers + OAuth redirect URLs)
+**Next:** Phase 2 — Profile Page (03 Profile Page — Full UI)
 
 ---
 
@@ -24,8 +24,8 @@ Update this file after every completed feature. Any AI agent reading this should
 
 ### Phase 1 — Foundation
 
-- [ ] 01 Auth
-- [ ] 02 Database Schema
+- [x] 01 Auth — email/password + OAuth (Google, GitHub), backend PKCE proxy, auth-aware nav & landing CTAs wired
+- [x] 02 Database Schema — tables (profiles, applications, resume_scores, agent_logs), indexes, updated_at triggers, auto-profile trigger on signup, RLS policies, resumes storage bucket, OAuth redirect URLs configured
 
 ### Phase 2 — Profile Page
 
@@ -66,6 +66,15 @@ Update this file after every completed feature. Any AI agent reading this should
 ---
 
 ## Notes
+
+### 2026-06-18 — Landing CTAs + auth-aware nav
+
+- Landed CTAs wired: "Start tracking free" / "Create free account" → `/login?mode=signup`; "Sign in" → `/login`; Features/How it works → `/#features` / `/#how-it-works` anchors
+- LandingNav is auth-aware via `useAuth()` hook — shows different links based on session
+- LandingFooter GitHub → `https://github.com/tonybnya/jobacker` (target=_blank)
+- `cursor-pointer` added to all buttons across LoginPage, Navbar, HeroSection
+- DB tables created and verified (profiles, applications, resume_scores, agent_logs)
+- OAuth redirect `http://localhost:5173/**` configured via insforge.toml
 
 - Add notes here after each completed feature. Record any unexpected decisions, workarounds, or deviations from the build plan.
 - If a feature required a package not in the approved list in `code-standards.md`, document it here with the reason.

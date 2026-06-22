@@ -69,27 +69,48 @@ All animated elements use CSS class selectors (`.sketch-path`, `.sketch-circle`,
 
 ---
 
-### Nav (Landing Page)
+### LandingNav (Landing Page)
 
-File: `src/components/Navbar.tsx`
-Last updated: 2026-06-16
+File: `src/components/landing/LandingNav.tsx`
+Last updated: 2026-06-18
 
-| Property       | Class / Value                                                                          |
-| -------------- | -------------------------------------------------------------------------------------- |
-| Position       | `fixed top-0 left-0 right-0 z-50`                                                     |
-| Background     | Transparent by default; `.glass border-b border-[#292524]` after scroll (state-driven) |
-| Height         | `h-14` (56px)                                                                          |
-| Inner layout   | `max-w-7xl mx-auto px-6 flex items-center justify-between`                             |
-| Logo mark      | `w-6 h-6 rounded bg-[#F59E0B]` square, SVG layers icon in `#1C1917`                  |
-| Logo text      | `font-mono text-sm font-semibold tracking-tight text-text` (`#D6D3D1`)                |
-| Alpha badge    | `text-[9px] font-mono px-1.5 py-0.5 rounded border border-[#F59E0B]/30 text-amber`   |
-| Nav links      | `text-xs text-text-muted font-mono hover:text-text transition-colors tracking-wide`   |
-| Sign in button | `text-xs font-mono text-text px-4 py-2 rounded-full hover:text-white`                 |
-| CTA button     | `text-xs font-mono bg-[#F5F5F4] text-foreground px-4 py-2 rounded-lg font-medium hover:bg-white` |
-| Scroll trigger | `window.addEventListener('scroll', ...)` → `setScrolled(window.scrollY > 40)`        |
+| Property        | Class / Value                                                                                          |
+| --------------- | ------------------------------------------------------------------------------------------------------ |
+| Position        | `fixed top-0 left-0 right-0 z-50`                                                                     |
+| Background      | Transparent by default; `glass border-b border-border` after scroll (state-driven)                     |
+| Height          | `h-14` (56px)                                                                                         |
+| Inner layout    | `max-w-7xl mx-auto px-6 flex items-center justify-between`                                            |
+| Logo mark       | `<img src={logo} />` — `w-6 h-6 rounded object-cover` (image asset)                                   |
+| Logo text       | `font-mono text-sm font-semibold tracking-tight text-text`                                            |
+| Signed-out links| `text-xs text-text-muted font-mono hover:text-text transition-colors tracking-wide` — anchor href `/#features`, `/#how-it-works` |
+| Sign in button  | `text-xs font-mono text-text px-4 py-2 rounded-full hover:text-white transition-colors`               |
+| CTA button      | `text-xs font-mono bg-[#F5F5F4] text-foreground px-4 py-2 rounded-lg font-medium hover:bg-white transition-colors` — `/login?mode=signup` |
+| Signed-in links | `rounded-full px-3 py-1.5 font-mono text-[11px] text-text-muted transition-colors hover:text-text` with HugeIcon + label — Dashboard(`/dashboard`), Applications(`/applications`), Profile(`/profile`), Scores(`/applications`), Sign Out |
+| Scroll trigger  | `window.addEventListener('scroll', ...)` → `setScrolled(window.scrollY > 40)`                          |
 
 **Pattern notes:**
-Scroll detection uses a boolean state, not a class toggle on the element. The `transition-all duration-500` on the `<nav>` ensures smooth glass fade-in. The logo mark is always a 24×24px amber square with a stacked-layers SVG — never a wordmark or image. The alpha badge is always present during pre-launch; remove it when the app reaches stable release.
+Auth-aware via `useAuth()` — shows different content based on `user` state. Signed-in links use `flex items-center gap-1` row layout, each link has a 14px HugeIcon + text label. Signed-out CTAs use anchor tags (`<a>`), not React Router `<Link>`, because they point to `/login` which is outside the landing page route. `cursor-pointer` on all clickable elements. Transition `duration-500` on nav for smooth glass fade-in.
+
+---
+
+### Navbar (Dashboard Layout)
+
+File: `src/components/layout/Navbar.tsx`
+Last updated: 2026-06-18
+
+| Property        | Class / Value                                                                                          |
+| --------------- | ------------------------------------------------------------------------------------------------------ |
+| Position        | `fixed top-0 left-0 right-0 z-50`                                                                     |
+| Background      | `border-b border-border bg-surface backdrop-blur-xl` — always glass, no scroll trigger                 |
+| Height          | `h-14` (56px)                                                                                         |
+| Inner layout    | `mx-auto flex h-14 max-w-7xl items-center justify-between px-6`                                       |
+| Logo mark       | `<img src={logo} />` — `h-6 w-6 rounded object-cover` (image asset)                                   |
+| Logo text       | `font-mono text-sm font-semibold tracking-tight text-text`                                            |
+| Signed-in links | Same as LandingNav — Dashboard, Applications, Profile, Scores, Sign Out (identical classes)            |
+| Signed-out link | `rounded-full border border-border bg-surface px-4 py-1.5 font-mono text-[11px] text-text transition-colors hover:border-border-amber/30` — Sign In to `/login` |
+
+**Pattern notes:**
+No scroll detection — always glass. Logo wraps to `/` via React Router `<Link>`. Signed-out shows a single "Sign In" pill button instead of the two-button row from LandingNav. Signed-in link classes are identical to LandingNav for visual consistency.
 
 ---
 

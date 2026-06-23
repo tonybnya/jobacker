@@ -5,6 +5,7 @@ import authRoutes from "@/routes/auth";
 import profileRoutes from "@/routes/profile";
 import applicationsRoutes from "@/routes/applications";
 import agentRoutes from "@/routes/agent";
+import dashboardRoutes from "@/routes/dashboard";
 
 const app = express();
 const PORT = process.env.PORT ?? 3001;
@@ -16,6 +17,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/applications", applicationsRoutes);
 app.use("/api/agent", agentRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 app.get("/api/health", (_req, res) => {
   res.json({ success: true, data: { status: "ok" } });

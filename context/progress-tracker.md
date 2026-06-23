@@ -6,9 +6,9 @@ Update this file after every completed feature. Any AI agent reading this should
 
 ## Current Status
 
-**Phase:** Phase 2 — Profile Page
-**Last completed:** 04 Profile Save Logic + Resume Upload (backend GET/PUT/POST /resume routes, useProfile hook, wired ProfilePage, ResumeUpload with actual upload)
-**Next:** Phase 3 — Applications (05 Applications Page — Full UI)
+**Phase:** Phase 5 — Dashboard
+**Last completed:** 10 + 11 + 12 Dashboard — Full UI + real data + analytics charts (DashboardPage with CompletionBanner, StatsBar, RecentActivity, AnalyticsCharts with recharts, 3 backend endpoints for stats/activity/analytics, useDashboard hook)
+**Next:** Configure ANTHROPIC_API_KEY, POSTHOG_KEY in .env — then test full flow end to end
 
 ---
 
@@ -34,20 +34,20 @@ Update this file after every completed feature. Any AI agent reading this should
 
 ### Phase 3 — Applications
 
-- [ ] 05 Applications Page — Full UI
-- [ ] 06 Application CRUD Logic
+- [x] 05 Applications Page — Full UI (ApplicationsTable, PipelineView with Framer Motion drag, ApplicationModal with AnimatePresence, ApplicationFilters)
+- [x] 06 Application CRUD Logic (backend GET/POST/PUT/DELETE routes with Zod validation + PostgREST, useApplications hook)
 
 ### Phase 4 — Resume Scoring
 
-- [ ] 07 Application Detail Page — Full UI
-- [ ] 08 Resume Scoring Agent
-- [ ] 09 Cover Letter + Tailored Resume Generation
+- [x] 07 Application Detail Page — Full UI (ApplicationDetailPage, ScoreCard, SkillsMatchBreakdown, ProsConsList, MissingKeywords, Improvements, SampleResume, CoverLetter, ApplicationInfo)
+- [x] 08 Resume Scoring Agent (Claude scorer with 8-section prompt, POST /api/agent/score, saves to resume_scores + sets latest_score_id)
+- [x] 09 Cover Letter + Tailored Resume Generation (POST /api/agent/cover-letter, POST /api/agent/tailor-resume with pdf-lib PDF generation + InsForge Storage upload)
 
 ### Phase 5 — Dashboard
 
-- [ ] 10 Dashboard Page — Full UI
-- [ ] 11 Stats Bar + Recent Activity — Real Data
-- [ ] 12 Analytics Charts — Real Data
+- [x] 10 Dashboard Page — Full UI (DashboardPage with CompletionBanner reuse, StatsBar, RecentActivity, AnalyticsCharts)
+- [x] 11 Stats Bar + Recent Activity — Real Data (GET /api/dashboard/stats + /api/dashboard/activity, useDashboard hook)
+- [x] 12 Analytics Charts — Real Data (GET /api/dashboard/analytics, recharts AreaChart + BarChart with design token colors, empty states)
 
 ---
 
@@ -87,3 +87,12 @@ Update this file after every completed feature. Any AI agent reading this should
 - Storage upload endpoint: `PUT {INSFORGE_URL}/api/storage/buckets/resumes/objects/{encodedKey}` with FormData body.
 - No loader/spinner icons in hugeicons-react v0.4.0 — use inline SVG spinner animation (`animate-spin` Tailwind class with circle + path).
 - Profile page uses edit/save/cancel toggle pattern with local form state.
+- No ChevronDownIcon in hugeicons-react v0.4.0 — use ArrowDown01Icon with rotate-180 for dropdown indicators.
+- PipelineView uses Framer Motion `layout` + `layoutId` for smooth card position animations within columns; draggable cards fire `onDragStart`/`onDragEnd` but cross-column drag status update is deferred.
+- ApplicationModal uses inline Framer Motion AnimatePresence (no shadcn/ui dialog installed — shadcn/ui was specified in build plan Phase 0 but never initialized).
+- pdf-lib v1.17.3 installed for PDF generation — generates ATS-friendly PDF from plain text with Helvetica font, proper word wrapping, and section header detection.
+- @anthropic-ai/sdk installed in backend — all three agents use `claude-sonnet-4-20250514` model with specific max_tokens per use case (scorer: 4096, cover-letter: 800, resume-tailor: 1500).
+- ANTHROPIC_API_KEY, POSTHOG_KEY, POSTHOG_HOST in backend .env are empty — agent endpoints will return 500 until configured.
+- PostHog server-side events not wired yet (posthog-node not installed, keys not configured).
+- recharts v2 installed in frontend for AnalyticsCharts — uses ResponsiveContainer, AreaChart, BarChart with custom Tooltip component. Chart colors reference CSS variables via `var(--color-amber)`, `var(--color-border)`, etc.
+- Dashboard backend routes use raw PostgREST queries (not dbFetch helper from insforge.ts) — avoids circular imports and keeps dashboard queries simple. Reuses the same auth pattern (Bearer token + user_id scoping).

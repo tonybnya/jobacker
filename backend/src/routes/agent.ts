@@ -1,9 +1,197 @@
 import { Router, type Request, type Response } from "express";
+import { requireAuth } from "@/middleware/requireAuth";
+import { getApplication, getProfile, createResumeScore, updateResumeScore, getLatestScore, updateApplication } from "@/lib/insforge";
+import type { Application, ResumeScore } from "@/types";
+import { scoreResume } from "@/agent/scorer";
+import { generateCoverLetter } from "@/agent/cover-letter";
+import { generateTailoredResume } from "@/agent/resume-tailor";
+import { generatePdfBuffer } from "@/agent/pdf-generator";
 
 const router = Router();
 
-router.all("*", (_req: Request, res: Response) => {
-  res.status(501).json({ success: false, error: "Not implemented" });
+router.use(requireAuth);
+
+router.post("/score", async (req: Request, res: Response) => {
+  try {
+    const { applicationId } = req.body as { applicationId?: string };
+    if (!applicationId) {
+      return res.status(400).json({ success: false, error: "applicationId is required" });
+    }
+
+    const token = req.headers.authorization!.slice(7);
+
+    const appResult = await getApplication(token, applicationId, req.user!.id);
+    if (!appResult.data) {
+      return res.status(404).json({ success: false, error: "Application not found" });
+    }
+    const application = appResult.data;
+
+    if (!application.job_description) {
+      return res.status(400).json({ success: false, error: "Job description is required. Paste one on the application detail page first." });
+    }
+
+    const profileResult = await getProfile(token, req.user!.id);
+    if (!profileResult.data?.resume_text) {
+      return res.status(400).json({ success: false, error: "Please upload your base resume in your profile before scoring." });
+    }
+
+    const agentResult = await scoreResume(profileResult.data.resume_text, application.job_description);
+    if (!agentResult.success) {
+      return res.status(500).json({ success: false, error: agentResult.error });
+    }
+
+    const { result } = agentResult;
+
+    const scorePayload: Record<string, unknown> = {
+      application_id: applicationId,
+      user_id: req.user!.id,
+      overall_score: result.overall_score,
+      keyword_score: result.keyword_score,
+      ats_score: result.ats_score,
+      impact_score: result.impact_score,
+      readability_score: result.readability_score,
+      skills_match: result.skills_match,
+      pros: result.pros,
+      cons: result.cons,
+      missing_keywords: result.missing_keywords,
+      improvements: result.improvements,
+      sample_resume_text: result.sample_resume_text,
+      resume_text_used: profileResult.data.resume_text,
+    };
+
+    const scoreResult = await createResumeScore(token, scorePayload);
+    if (!scoreResult.data) {
+      return res.status(500).json({ success: false, error: "Failed to save score" });
+    }
+
+    await updateApplication(token, applicationId, req.user!.id, {
+      latest_score_id: scoreResult.data.id,
+    } as Partial<Application>);
+
+    const normalized = {
+      ...scoreResult.data,
+      skills_match: typeof scoreResult.data.skills_match === "string" ? JSON.parse(scoreResult.data.skills_match) : scoreResult.data.skills_match,
+      pros: typeof scoreResult.data.pros === "string" ? JSON.parse(scoreResult.data.pros) : scoreResult.data.pros,
+      cons: typeof scoreResult.data.cons === "string" ? JSON.parse(scoreResult.data.cons) : scoreResult.data.cons,
+      missing_keywords: typeof scoreResult.data.missing_keywords === "string" ? JSON.parse(scoreResult.data.missing_keywords) : scoreResult.data.missing_keywords,
+      improvements: typeof scoreResult.data.improvements === "string" ? JSON.parse(scoreResult.data.improvements) : scoreResult.data.improvements,
+    };
+
+    return res.json({ success: true, score: normalized });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: "Internal server error" });
+  }
+});
+
+router.post("/cover-letter", async (req: Request, res: Response) => {
+  try {
+    const { applicationId } = req.body as { applicationId?: string };
+    if (!applicationId) {
+      return res.status(400).json({ success: false, error: "applicationId is required" });
+    }
+
+    const token = req.headers.authorization!.slice(7);
+
+    const appResult = await getApplication(token, applicationId, req.user!.id);
+    if (!appResult.data) {
+      return res.status(404).json({ success: false, error: "Application not found" });
+    }
+    const application = appResult.data;
+
+    const profileResult = await getProfile(token, req.user!.id);
+    const resumeText = profileResult.data?.resume_text;
+    if (!resumeText) {
+      return res.status(400).json({ success: false, error: "Please upload your base resume in your profile first." });
+    }
+
+    const scoreResult = await getLatestScore(token, applicationId, req.user!.id);
+    if (!scoreResult.data) {
+      return res.status(400).json({ success: false, error: "Please score your resume first." });
+    }
+
+    const agentResult = await generateCoverLetter(resumeText, application.job_description ?? "", application.company, application.role);
+    if (!agentResult.success) {
+      return res.status(500).json({ success: false, error: agentResult.error });
+    }
+
+    await updateResumeScore(token, scoreResult.data.id, req.user!.id, {
+      cover_letter: agentResult.text,
+    } as Partial<ResumeScore>);
+
+    return res.json({ success: true, cover_letter: agentResult.text });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: "Internal server error" });
+  }
+});
+
+router.post("/tailor-resume", async (req: Request, res: Response) => {
+  try {
+    const { applicationId } = req.body as { applicationId?: string };
+    if (!applicationId) {
+      return res.status(400).json({ success: false, error: "applicationId is required" });
+    }
+
+    const token = req.headers.authorization!.slice(7);
+
+    const appResult = await getApplication(token, applicationId, req.user!.id);
+    if (!appResult.data) {
+      return res.status(404).json({ success: false, error: "Application not found" });
+    }
+    const application = appResult.data;
+
+    const profileResult = await getProfile(token, req.user!.id);
+    const resumeText = profileResult.data?.resume_text;
+    if (!resumeText) {
+      return res.status(400).json({ success: false, error: "Please upload your base resume in your profile first." });
+    }
+
+    const scoreResult = await getLatestScore(token, applicationId, req.user!.id);
+    let sampleText: string;
+
+    if (scoreResult.data?.sample_resume_text) {
+      sampleText = scoreResult.data.sample_resume_text;
+    } else {
+      const agentResult = await generateTailoredResume(resumeText, application.job_description ?? "");
+      if (!agentResult.success) {
+        return res.status(500).json({ success: false, error: agentResult.error });
+      }
+      sampleText = agentResult.text;
+    }
+
+    const pdfBuffer = await generatePdfBuffer(sampleText);
+
+    const storageKey = `resumes/${req.user!.id}/${applicationId}-tailored.pdf`;
+    const storageUrl = `${process.env.INSFORGE_URL}/api/storage/buckets/resumes/objects/${encodeURIComponent(storageKey)}`;
+
+    const formData = new FormData();
+    const blob = new Blob([new Uint8Array(pdfBuffer)], { type: "application/pdf" });
+    formData.append("file", blob, "tailored.pdf");
+
+    const uploadRes = await fetch(storageUrl, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    if (!uploadRes.ok) {
+      return res.status(500).json({ success: false, error: "Failed to upload tailored PDF" });
+    }
+
+    const publicUrl = `${process.env.INSFORGE_URL}/api/storage/buckets/resumes/objects/${encodeURIComponent(storageKey)}`;
+
+    if (scoreResult.data) {
+      await updateResumeScore(token, scoreResult.data.id, req.user!.id, {
+        sample_resume_text: sampleText,
+        tailored_resume_pdf_url: publicUrl,
+      } as Partial<ResumeScore>);
+    }
+
+    return res.json({ success: true, sample_resume_text: sampleText, tailored_resume_pdf_url: publicUrl });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: "Internal server error" });
+  }
 });
 
 export default router;

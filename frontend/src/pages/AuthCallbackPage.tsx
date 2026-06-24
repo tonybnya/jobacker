@@ -1,30 +1,14 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-
-const TOKEN_KEY = "insforge_token";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 export function AuthCallbackPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    let cancelled = false;
-
-    const poll = async () => {
-      for (let i = 0; i < 30; i++) {
-        if (cancelled) return;
-        const token = localStorage.getItem(TOKEN_KEY);
-        if (token) {
-          navigate("/dashboard", { replace: true });
-          return;
-        }
-        await new Promise((r) => setTimeout(r, 500));
-      }
-      if (!cancelled) navigate("/login", { replace: true });
-    };
-
-    poll();
-    return () => { cancelled = true; };
-  }, [navigate]);
+    const redirectUrl = `/dashboard?${searchParams.toString()}`;
+    navigate(redirectUrl, { replace: true });
+  }, [navigate, searchParams]);
 
   return (
     <div className="flex h-screen items-center justify-center bg-bg">

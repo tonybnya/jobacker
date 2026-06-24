@@ -52,10 +52,10 @@ export function ScoreCard({
   }
 
   const bars = [
-    { label: "Keyword Match", value: keywordScore, color: "bg-blue-500" },
-    { label: "ATS Compliance", value: atsScore, color: "bg-emerald-500" },
-    { label: "Impact Phrases", value: impactScore, color: "bg-amber" },
-    { label: "Readability", value: readabilityScore, color: "bg-purple-500" },
+    { label: "Keyword Match", value: keywordScore, color: "bg-keyword-match" },
+    { label: "ATS Compliance", value: atsScore, color: "bg-ats" },
+    { label: "Impact Phrases", value: impactScore, color: "bg-impact" },
+    { label: "Readability", value: readabilityScore, color: "bg-readability" },
   ];
 
   const circumference = 2 * Math.PI * 48;

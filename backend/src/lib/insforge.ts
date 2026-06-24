@@ -155,3 +155,10 @@ export function updateResumeScore(token: string, id: string, userId: string, upd
     body: JSON.stringify(updates),
   }).then((r) => ({ data: r.data?.[0] ?? null, error: r.error }));
 }
+
+export function writeAgentLog(token: string, entry: { application_id?: string; user_id: string; action: string; error: string }) {
+  return dbFetch<unknown>("/agent_logs", token, {
+    method: "POST",
+    body: JSON.stringify({ ...entry, created_at: new Date().toISOString() }),
+  }).then((r) => ({ data: r.data, error: r.error }));
+}

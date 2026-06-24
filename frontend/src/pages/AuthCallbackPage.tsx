@@ -1,59 +1,29 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { apiFetch } from "@/lib/api-client";
 
-const PKCE_VERIFIER_KEY = "insforge_pkce_verifier";
-
-function retrievePkceVerifier(): string | null {
-  try {
-    const verifier = sessionStorage.getItem(PKCE_VERIFIER_KEY);
-    if (verifier) {
-      sessionStorage.removeItem(PKCE_VERIFIER_KEY);
-    }
-    return verifier;
-  } catch {
-    return null;
-  }
-}
+const TOKEN_KEY = "insforge_token";
 
 export function AuthCallbackPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get("insforge_code");
+    let cancelled = false;
 
-    if (!code) {
-      navigate("/login", { replace: true });
-      return;
-    }
-
-    const codeVerifier = retrievePkceVerifier();
-    if (!codeVerifier) {
-      navigate("/login", { replace: true });
-      return;
-    }
-
-    const exchange = async () => {
-      const { data, error } = await apiFetch<{
-        user: { id: string; email: string };
-        accessToken: string;
-      }>("/api/auth/oauth/exchange", {
-        method: "POST",
-        body: JSON.stringify({ code, codeVerifier }),
-      });
-
-      if (error || !data) {
-        navigate("/login", { replace: true });
-        return;
+    const poll = async () => {
+      for (let i = 0; i < 30; i++) {
+        if (cancelled) return;
+        const token = localStorage.getItem(TOKEN_KEY);
+        if (token) {
+          navigate("/dashboard", { replace: true });
+          return;
+        }
+        await new Promise((r) => setTimeout(r, 500));
       }
-
-      localStorage.setItem("insforge_token", data.accessToken);
-      window.history.replaceState({}, document.title, window.location.pathname);
-      navigate("/dashboard", { replace: true });
+      if (!cancelled) navigate("/login", { replace: true });
     };
 
-    exchange().catch(() => navigate("/login", { replace: true }));
+    poll();
+    return () => { cancelled = true; };
   }, [navigate]);
 
   return (

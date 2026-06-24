@@ -12,22 +12,35 @@ import { CoverLetter } from "@/components/applications/CoverLetter";
 import { ApplicationInfo } from "@/components/applications/ApplicationInfo";
 import type { Application, ResumeScore } from "@/types";
 
+const TOKEN_KEY = "insforge_token";
+
+function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
+  return fetch(url, {
+    ...options,
+    headers: {
+      ...(options?.method ? { "Content-Type": "application/json" } : {}),
+      Authorization: `Bearer ${localStorage.getItem(TOKEN_KEY) ?? ""}`,
+      ...options?.headers,
+    },
+  }).then((r) => r.json());
+}
+
 const STATUS_COLORS: Record<string, string> = {
-  applied: "bg-amber/10 text-amber",
-  "phone-screen": "bg-blue-500/10 text-blue-400",
-  interviewing: "bg-emerald-500/10 text-emerald-400",
-  offer: "bg-gold/10 text-gold",
-  rejected: "bg-red-500/10 text-red-400",
-  ghosted: "bg-text-dim/10 text-text-dim",
+  applied: "bg-status-applied/10 text-status-applied",
+  "phone-screen": "bg-status-phone/10 text-status-phone",
+  interviewing: "bg-status-interview/10 text-status-interview",
+  offer: "bg-status-offer/10 text-status-offer",
+  rejected: "bg-status-rejected/10 text-status-rejected",
+  ghosted: "bg-status-ghosted/10 text-status-ghosted",
 };
 
 const TYPE_COLORS: Record<string, string> = {
-  remote: "bg-emerald-500/10 text-emerald-400",
-  hybrid: "bg-amber/10 text-amber",
-  "on-site": "bg-blue-500/10 text-blue-400",
-  "part-time": "bg-purple-500/10 text-purple-400",
-  internship: "bg-pink-500/10 text-pink-400",
-  contract: "bg-orange-500/10 text-orange-400",
+  remote: "bg-type-remote/10 text-type-remote",
+  hybrid: "bg-type-hybrid/10 text-type-hybrid",
+  "on-site": "bg-type-on-site/10 text-type-on-site",
+  "part-time": "bg-type-part-time/10 text-type-part-time",
+  internship: "bg-type-internship/10 text-type-internship",
+  contract: "bg-type-contract/10 text-type-contract",
 };
 
 export function ApplicationDetailPage() {
@@ -55,12 +68,7 @@ export function ApplicationDetailPage() {
       return;
     }
     setLoadingScore(true);
-    fetch(`/api/applications/${app.id}/score`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("access_token") ?? ""}`,
-      },
-    })
-      .then((r) => r.json())
+    fetchJson<{ success: boolean; score: ResumeScore | null }>(`/api/applications/${app.id}/score`)
       .then((data) => {
         if (data.success) setScore(data.score);
         else setScore(null);
@@ -73,15 +81,10 @@ export function ApplicationDetailPage() {
     if (!app) return;
     setScoring(true);
     try {
-      const res = await fetch("/api/agent/score", {
+      const data = await fetchJson<{ success: boolean; score: ResumeScore }>("/api/agent/score", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("access_token") ?? ""}`,
-        },
         body: JSON.stringify({ applicationId: app.id }),
       });
-      const data = await res.json();
       if (data.success) {
         setScore(data.score);
         setApp((prev) => prev ? { ...prev, latest_score_id: data.score.id } : prev);
@@ -95,15 +98,10 @@ export function ApplicationDetailPage() {
     if (!app) return;
     setGeneratingResume(true);
     try {
-      const res = await fetch("/api/agent/tailor-resume", {
+      const data = await fetchJson<{ success: boolean; sample_resume_text: string; tailored_resume_pdf_url: string }>("/api/agent/tailor-resume", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("access_token") ?? ""}`,
-        },
         body: JSON.stringify({ applicationId: app.id }),
       });
-      const data = await res.json();
       if (data.success && score) {
         setScore({ ...score, sample_resume_text: data.sample_resume_text, tailored_resume_pdf_url: data.tailored_resume_pdf_url });
       }
@@ -116,15 +114,10 @@ export function ApplicationDetailPage() {
     if (!app) return;
     setGeneratingCover(true);
     try {
-      const res = await fetch("/api/agent/cover-letter", {
+      const data = await fetchJson<{ success: boolean; cover_letter: string }>("/api/agent/cover-letter", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("access_token") ?? ""}`,
-        },
         body: JSON.stringify({ applicationId: app.id }),
       });
-      const data = await res.json();
       if (data.success && score) {
         setScore({ ...score, cover_letter: data.cover_letter });
       }

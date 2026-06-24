@@ -6,7 +6,6 @@ import type { User } from "@/types";
 const insforge = createClient({
   baseUrl: import.meta.env.VITE_INSFORGE_URL,
   anonKey: import.meta.env.VITE_INSFORGE_ANON_KEY,
-  auth: { detectOAuthCallback: false },
 });
 
 export function useAuth() {
@@ -82,7 +81,6 @@ export function useAuth() {
   const signInWithOAuth = async (provider: "google" | "github") => {
     const { data, error } = await insforge.auth.signInWithOAuth(provider, {
       redirectTo: `${window.location.origin}/auth/callback`,
-      skipBrowserRedirect: true,
     });
     if (error || !data?.url) return;
     window.location.href = data.url;

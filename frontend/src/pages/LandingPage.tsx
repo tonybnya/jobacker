@@ -13,7 +13,7 @@ import {
 
 gsap.registerPlugin(ScrollTrigger)
 
-export default function LandingPage() {
+export function LandingPage() {
   return (
     <div className="relative bg-bg min-h-screen">
       <LandingNav />

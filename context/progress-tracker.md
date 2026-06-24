@@ -6,9 +6,9 @@ Update this file after every completed feature. Any AI agent reading this should
 
 ## Current Status
 
-**Phase:** Phase 5 — Dashboard
-**Last completed:** 10 + 11 + 12 Dashboard — Full UI + real data + analytics charts (DashboardPage with CompletionBanner, StatsBar, RecentActivity, AnalyticsCharts with recharts, 3 backend endpoints for stats/activity/analytics, useDashboard hook)
-**Next:** Configure ANTHROPIC_API_KEY, POSTHOG_KEY in .env — then test full flow end to end
+**Phase:** Phase 6 — Code Review Fixes
+**Last completed:** Code review fixes — token key, OAuth PKCE, matchPercent normalization, agent_logs writes, design tokens (11 files), default exports, as/any casts, dashboard date, storage path
+**Next:** Configure ANTHROPIC_API_KEY in backend/.env, then test full flow end to end — sign up → upload resume → log application → paste JD → score → generate cover letter → tailored PDF → check dashboard
 
 ---
 
@@ -96,3 +96,21 @@ Update this file after every completed feature. Any AI agent reading this should
 - PostHog server-side events not wired yet (posthog-node not installed, keys not configured).
 - recharts v2 installed in frontend for AnalyticsCharts — uses ResponsiveContainer, AreaChart, BarChart with custom Tooltip component. Chart colors reference CSS variables via `var(--color-amber)`, `var(--color-border)`, etc.
 - Dashboard backend routes use raw PostgREST queries (not dbFetch helper from insforge.ts) — avoids circular imports and keeps dashboard queries simple. Reuses the same auth pattern (Bearer token + user_id scoping).
+
+### 2026-06-24 — Code review fixes (Phase 6 prep)
+
+- Fixed **token key mismatch**: `access_token` → `insforge_token` in useDashboard.ts and ApplicationDetailPage.tsx (4 raw fetch calls replaced with `fetchJson` wrapper)
+- Fixed **OAuth PKCE flow**: removed `skipBrowserRedirect: true` and `detectOAuthCallback: false` — SDK now handles PKCE verifier storage and callback auto-detection natively; AuthCallbackPage polls for token
+- Fixed **matchPercent normalization**: scorer returns `matchPercent` (camelCase), route normalizes to `match_percent` before saving to resume_scores
+- Fixed **agent_logs writes**: added `writeAgentLog` to insforge.ts, wired error logging in all 3 agent routes (score, cover-letter, tailor-resume)
+- Fixed **raw palette colors → design tokens**: 11 component files updated (ApplicationsTable, PipelineView, ApplicationDetailPage, ScoreCard, ProsConsList, Improvements, RecentActivity, StatsBar, ApplicationModal, index.css) — semantic tokens added to `@theme` (status-*, type-*, pros, cons, keyword-match, ats, impact, readability), all `bg-blue-500/10` → `bg-status-phone/10` etc.
+- Fixed **default exports**: App.tsx, LandingPage.tsx changed to named exports, imports updated in main.tsx and App.tsx
+- Fixed **as/any casts**: `(res as any).total` → typed `Record<string, unknown>` cast in useApplications.ts; removed all `as Partial<...>` casts from agent.ts
+- Fixed **dashboard date bug**: `thirtyDaysAgo` uses local date math (not UTC via `toISOString`) so date comparison matches DB dates
+- Fixed **storage path drift**: resume uploads now use `{userId}/base.pdf` instead of timestamped filenames — consistent key path, old file overwritten on re-upload
+
+**Still open (non-blocking):**
+- PostHog events not wired (needs posthog-node + keys in .env)
+- useAuth not a React context provider (session can desync across tabs)
+- pdf-lib vs @react-pdf/renderer decision not made
+- SCORE_THRESHOLD constant imported nowhere (lint-only, no runtime impact)

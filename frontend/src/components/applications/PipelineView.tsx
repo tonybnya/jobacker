@@ -12,21 +12,21 @@ const COLUMNS: { key: ApplicationStatus; label: string }[] = [
 ];
 
 const COLUMN_COLORS: Record<string, string> = {
-  applied: "border-l-amber",
-  "phone-screen": "border-l-blue-500",
-  interviewing: "border-l-emerald-500",
-  offer: "border-l-gold",
-  rejected: "border-l-red-500",
-  ghosted: "border-l-text-dim",
+  applied: "border-l-status-applied",
+  "phone-screen": "border-l-status-phone",
+  interviewing: "border-l-status-interview",
+  offer: "border-l-status-offer",
+  rejected: "border-l-status-rejected",
+  ghosted: "border-l-status-ghosted",
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  applied: "bg-amber/10 text-amber",
-  "phone-screen": "bg-blue-500/10 text-blue-400",
-  interviewing: "bg-emerald-500/10 text-emerald-400",
-  offer: "bg-gold/10 text-gold",
-  rejected: "bg-red-500/10 text-red-400",
-  ghosted: "bg-text-dim/10 text-text-dim",
+  applied: "bg-status-applied/10 text-status-applied",
+  "phone-screen": "bg-status-phone/10 text-status-phone",
+  interviewing: "bg-status-interview/10 text-status-interview",
+  offer: "bg-status-offer/10 text-status-offer",
+  rejected: "bg-status-rejected/10 text-status-rejected",
+  ghosted: "bg-status-ghosted/10 text-status-ghosted",
 };
 
 interface PipelineViewProps {

@@ -27,6 +27,27 @@
   --radius-lg: 12px;
   --radius-xl: 16px;
   --radius-full: 9999px;
+
+  --color-status-applied: #F59E0B;
+  --color-status-phone: #3B82F6;
+  --color-status-interview: #10B981;
+  --color-status-rejected: #EF4444;
+  --color-status-offer: #FBBF24;
+  --color-status-ghosted: #78716C;
+
+  --color-type-on-site: #3B82F6;
+  --color-type-remote: #10B981;
+  --color-type-hybrid: #F59E0B;
+  --color-type-part-time: #A855F7;
+  --color-type-internship: #EC4899;
+  --color-type-contract: #F97316;
+
+  --color-pros: #10B981;
+  --color-cons: #EF4444;
+  --color-keyword-match: #3B82F6;
+  --color-ats: #10B981;
+  --color-impact: #F59E0B;
+  --color-readability: #A855F7;
 }
 
 * {

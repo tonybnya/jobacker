@@ -2,21 +2,21 @@ import type { Application } from "@/types";
 import { EyeIcon, ViewOffIcon } from "hugeicons-react";
 
 const STATUS_COLORS: Record<string, string> = {
-  applied: "bg-amber/10 text-amber",
-  "phone-screen": "bg-blue-500/10 text-blue-400",
-  interviewing: "bg-emerald-500/10 text-emerald-400",
-  offer: "bg-gold/10 text-gold",
-  rejected: "bg-red-500/10 text-red-400",
-  ghosted: "bg-text-dim/10 text-text-dim",
+  applied: "bg-status-applied/10 text-status-applied",
+  "phone-screen": "bg-status-phone/10 text-status-phone",
+  interviewing: "bg-status-interview/10 text-status-interview",
+  offer: "bg-status-offer/10 text-status-offer",
+  rejected: "bg-status-rejected/10 text-status-rejected",
+  ghosted: "bg-status-ghosted/10 text-status-ghosted",
 };
 
 const TYPE_COLORS: Record<string, string> = {
-  remote: "bg-emerald-500/10 text-emerald-400",
-  hybrid: "bg-amber/10 text-amber",
-  "on-site": "bg-blue-500/10 text-blue-400",
-  "part-time": "bg-purple-500/10 text-purple-400",
-  internship: "bg-pink-500/10 text-pink-400",
-  contract: "bg-orange-500/10 text-orange-400",
+  remote: "bg-type-remote/10 text-type-remote",
+  hybrid: "bg-type-hybrid/10 text-type-hybrid",
+  "on-site": "bg-type-on-site/10 text-type-on-site",
+  "part-time": "bg-type-part-time/10 text-type-part-time",
+  internship: "bg-type-internship/10 text-type-internship",
+  contract: "bg-type-contract/10 text-type-contract",
 };
 
 interface ApplicationsTableProps {
@@ -74,7 +74,7 @@ export function ApplicationsTable({ applications, onEdit, onDelete, page, pageSi
                   </td>
                   <td className="px-4 py-3">
                     {app.spy_status === "opened" ? (
-                      <EyeIcon className="h-3.5 w-3.5 text-emerald-400" />
+                      <EyeIcon className="h-3.5 w-3.5 text-status-interview" />
                     ) : (
                       <ViewOffIcon className="h-3.5 w-3.5 text-text-dim" />
                     )}
@@ -93,7 +93,7 @@ export function ApplicationsTable({ applications, onEdit, onDelete, page, pageSi
                       <button
                         type="button"
                         onClick={() => onDelete(app.id)}
-                        className="cursor-pointer text-text-dim transition-colors hover:text-red-400"
+                        className="cursor-pointer text-text-dim transition-colors hover:text-status-rejected"
                       >
                         Delete
                       </button>

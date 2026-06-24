@@ -1,9 +1,9 @@
 import type { Improvement, ImprovementTag } from "@/types";
 
 const TAG_STYLES: Record<ImprovementTag, string> = {
-  ADD: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-  REPHRASE: "bg-amber/10 text-amber border-amber/20",
-  FORMAT: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+  ADD: "bg-pros/10 text-pros border-pros/20",
+  REPHRASE: "bg-impact/10 text-impact border-impact/20",
+  FORMAT: "bg-keyword-match/10 text-keyword-match border-keyword-match/20",
 };
 
 interface ImprovementsProps {

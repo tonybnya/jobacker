@@ -1,10 +1,10 @@
 import type { ActivityItem } from "@/types";
 
 const TYPE_COLORS: Record<string, string> = {
-  score: "bg-emerald-500",
-  application: "bg-amber",
-  cover_letter: "bg-blue-500",
-  tailored_resume: "bg-purple-500",
+  score: "bg-pros",
+  application: "bg-impact",
+  cover_letter: "bg-keyword-match",
+  tailored_resume: "bg-readability",
 };
 
 interface RecentActivityProps {

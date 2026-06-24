@@ -18,10 +18,10 @@ interface StatsBarProps {
 
 export function StatsBar({ stats }: StatsBarProps) {
   const items: Stat[] = [
-    { label: "Total Applications", value: stats.totalApplications, color: "text-amber" },
-    { label: "Avg. Resume Score", value: stats.avgResumeScore ?? "-", suffix: stats.avgResumeScore !== null ? "%" : undefined, color: "text-emerald-400" },
-    { label: "Interviews Landed", value: stats.interviewsLanded, color: "text-blue-400" },
-    { label: "Offers Received", value: stats.offersReceived, color: "text-gold" },
+    { label: "Total Applications", value: stats.totalApplications, color: "text-impact" },
+    { label: "Avg. Resume Score", value: stats.avgResumeScore ?? "-", suffix: stats.avgResumeScore !== null ? "%" : undefined, color: "text-pros" },
+    { label: "Interviews Landed", value: stats.interviewsLanded, color: "text-keyword-match" },
+    { label: "Offers Received", value: stats.offersReceived, color: "text-status-offer" },
   ];
 
   return (

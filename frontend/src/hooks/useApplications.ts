@@ -60,7 +60,7 @@ export function useApplications(): UseApplicationsReturn {
         if (controller.signal.aborted) return;
         if (res.success && res.data) {
           setApplications(res.data);
-          setTotal((res as any).total ?? res.data.length);
+          setTotal("total" in res && typeof (res as Record<string, unknown>).total === "number" ? (res as Record<string, unknown>).total as number : res.data.length);
           setPage(filters.page);
         }
       })

@@ -140,10 +140,13 @@ router.get("/analytics", async (req: Request, res: Response) => {
     const scoreList = Array.isArray(scores) ? scores : [];
 
     const now = new Date();
-    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const thirtyDaysAgo = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30);
     const dateMap = new Map<string, number>();
     for (let d = new Date(thirtyDaysAgo); d <= now; d.setDate(d.getDate() + 1)) {
-      dateMap.set(d.toISOString().split("T")[0], 0);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      dateMap.set(`${y}-${m}-${day}`, 0);
     }
     for (const app of appList) {
       const day = app.date_applied?.split("T")[0];

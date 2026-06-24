@@ -61,7 +61,7 @@ router.post("/resume", upload.single("resume"), async (req: Request, res: Respon
 
     const token = req.headers.authorization!.slice(7);
     const userId = req.user!.id;
-    const fileName = `${userId}/${Date.now()}-${file.originalname}`;
+    const fileName = `${userId}/base.pdf`;
 
     const formData = new FormData();
     const blob = new Blob([new Uint8Array(file.buffer)], { type: "application/pdf" });

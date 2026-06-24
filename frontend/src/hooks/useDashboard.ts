@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 import type { DashboardStats, ActivityItem, AnalyticsData } from "@/types";
 
+const TOKEN_KEY = "insforge_token";
+
 function getToken() {
-  return localStorage.getItem("access_token") ?? "";
+  return localStorage.getItem(TOKEN_KEY) ?? "";
 }
 
 async function fetchJson<T>(url: string): Promise<T | null> {

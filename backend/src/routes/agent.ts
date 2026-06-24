@@ -1,7 +1,6 @@
 import { Router, type Request, type Response } from "express";
 import { requireAuth } from "@/middleware/requireAuth";
-import { getApplication, getProfile, createResumeScore, updateResumeScore, getLatestScore, updateApplication } from "@/lib/insforge";
-import type { Application, ResumeScore } from "@/types";
+import { getApplication, getProfile, createResumeScore, updateResumeScore, getLatestScore, updateApplication, writeAgentLog } from "@/lib/insforge";
 import { scoreResume } from "@/agent/scorer";
 import { generateCoverLetter } from "@/agent/cover-letter";
 import { generateTailoredResume } from "@/agent/resume-tailor";
@@ -42,6 +41,11 @@ router.post("/score", async (req: Request, res: Response) => {
 
     const { result } = agentResult;
 
+    const normalizedSkills = (result.skills_match ?? []).map((s) => ({
+      skill: s.skill,
+      match_percent: s.matchPercent,
+    }));
+
     const scorePayload: Record<string, unknown> = {
       application_id: applicationId,
       user_id: req.user!.id,
@@ -50,7 +54,7 @@ router.post("/score", async (req: Request, res: Response) => {
       ats_score: result.ats_score,
       impact_score: result.impact_score,
       readability_score: result.readability_score,
-      skills_match: result.skills_match,
+      skills_match: normalizedSkills,
       pros: result.pros,
       cons: result.cons,
       missing_keywords: result.missing_keywords,
@@ -61,12 +65,13 @@ router.post("/score", async (req: Request, res: Response) => {
 
     const scoreResult = await createResumeScore(token, scorePayload);
     if (!scoreResult.data) {
+      await writeAgentLog(token, { application_id: applicationId, user_id: req.user!.id, action: "score", error: "Failed to save score" });
       return res.status(500).json({ success: false, error: "Failed to save score" });
     }
 
     await updateApplication(token, applicationId, req.user!.id, {
       latest_score_id: scoreResult.data.id,
-    } as Partial<Application>);
+    });
 
     const normalized = {
       ...scoreResult.data,
@@ -79,7 +84,11 @@ router.post("/score", async (req: Request, res: Response) => {
 
     return res.json({ success: true, score: normalized });
   } catch (err) {
-    return res.status(500).json({ success: false, error: "Internal server error" });
+    const errorMessage = err instanceof Error ? err.message : "Unknown error";
+    try {
+      await writeAgentLog(req.headers.authorization!.slice(7), { application_id: req.body.applicationId, user_id: req.user!.id, action: "score", error: errorMessage });
+    } catch {}
+    return res.status(500).json({ success: false, error: errorMessage });
   }
 });
 
@@ -116,11 +125,15 @@ router.post("/cover-letter", async (req: Request, res: Response) => {
 
     await updateResumeScore(token, scoreResult.data.id, req.user!.id, {
       cover_letter: agentResult.text,
-    } as Partial<ResumeScore>);
+    });
 
     return res.json({ success: true, cover_letter: agentResult.text });
   } catch (err) {
-    return res.status(500).json({ success: false, error: "Internal server error" });
+    const errorMessage = err instanceof Error ? err.message : "Unknown error";
+    try {
+      await writeAgentLog(req.headers.authorization!.slice(7), { application_id: req.body.applicationId, user_id: req.user!.id, action: "cover-letter", error: errorMessage });
+    } catch {}
+    return res.status(500).json({ success: false, error: errorMessage });
   }
 });
 
@@ -185,12 +198,16 @@ router.post("/tailor-resume", async (req: Request, res: Response) => {
       await updateResumeScore(token, scoreResult.data.id, req.user!.id, {
         sample_resume_text: sampleText,
         tailored_resume_pdf_url: publicUrl,
-      } as Partial<ResumeScore>);
+      });
     }
 
     return res.json({ success: true, sample_resume_text: sampleText, tailored_resume_pdf_url: publicUrl });
   } catch (err) {
-    return res.status(500).json({ success: false, error: "Internal server error" });
+    const errorMessage = err instanceof Error ? err.message : "Unknown error";
+    try {
+      await writeAgentLog(req.headers.authorization!.slice(7), { application_id: req.body.applicationId, user_id: req.user!.id, action: "tailor-resume", error: errorMessage });
+    } catch {}
+    return res.status(500).json({ success: false, error: errorMessage });
   }
 });
 

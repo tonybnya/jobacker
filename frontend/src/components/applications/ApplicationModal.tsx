@@ -269,7 +269,7 @@ export function ApplicationModal({ open, onClose, onSave, application }: Applica
               </div>
 
               {error && (
-                <p className="mt-3 text-xs text-red-400">{error}</p>
+                <p className="mt-3 text-xs text-status-rejected">{error}</p>
               )}
 
               <div className="mt-6 flex justify-end gap-3">

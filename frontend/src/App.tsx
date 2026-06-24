@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import LandingPage from "@/pages/LandingPage";
+import { LandingPage } from "@/pages/LandingPage";
 import { LoginPage } from "@/pages/LoginPage";
 import { AuthCallbackPage } from "@/pages/AuthCallbackPage";
 import { DashboardPage } from "@/pages/DashboardPage";
@@ -21,7 +21,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function App() {
+export function App() {
   return (
     <BrowserRouter>
       <Routes>

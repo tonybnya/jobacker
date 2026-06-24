@@ -1,6 +1,6 @@
 import { Router, type Request, type Response } from "express";
 import { requireAuth } from "@/middleware/requireAuth";
-import { getProfile, updateProfile } from "@/lib/insforge";
+import { getProfile, createProfile, updateProfile } from "@/lib/insforge";
 import { z } from "zod";
 import multer from "multer";
 
@@ -29,8 +29,13 @@ router.use(requireAuth);
 router.get("/", async (req: Request, res: Response) => {
   try {
     const token = req.headers.authorization!.slice(7);
-    const { data, error } = await getProfile(token, req.user!.id);
+    let { data, error } = await getProfile(token, req.user!.id);
     if (error) return res.status(500).json({ success: false, error });
+    if (!data) {
+      const created = await createProfile(token, req.user!.id, req.user!.email);
+      if (created.error) return res.status(500).json({ success: false, error: created.error });
+      data = created.data;
+    }
     return res.json({ success: true, data });
   } catch (err) {
     return res.status(500).json({ success: false, error: "Internal server error" });

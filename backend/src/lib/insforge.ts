@@ -117,7 +117,7 @@ export function createApplication(token: string, userId: string, app: Partial<Ap
   return dbFetch<Application[]>(`/applications`, token, {
     method: "POST",
     headers: { Prefer: "return=representation" },
-    body: JSON.stringify({ ...app, user_id: userId }),
+    body: JSON.stringify([{ ...app, user_id: userId }]),
   }).then((r) => ({ data: r.data?.[0] ?? null, error: r.error }));
 }
 
@@ -152,7 +152,7 @@ export function createResumeScore(token: string, score: Partial<ResumeScore>) {
   return dbFetch<ResumeScore[]>("/resume_scores", token, {
     method: "POST",
     headers: { Prefer: "return=representation" },
-    body: JSON.stringify(score),
+    body: JSON.stringify([score]),
   }).then((r) => ({ data: r.data?.[0] ?? null, error: r.error }));
 }
 
@@ -167,6 +167,6 @@ export function updateResumeScore(token: string, id: string, userId: string, upd
 export function writeAgentLog(token: string, entry: { application_id?: string; user_id: string; action: string; error: string }) {
   return dbFetch<unknown>("/agent_logs", token, {
     method: "POST",
-    body: JSON.stringify({ ...entry, created_at: new Date().toISOString() }),
+    body: JSON.stringify([{ ...entry, created_at: new Date().toISOString() }]),
   }).then((r) => ({ data: r.data, error: r.error }));
 }

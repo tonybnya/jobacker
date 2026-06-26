@@ -142,100 +142,52 @@ const url = data.publicUrl;
 
 ---
 
-## Anthropic (Claude)
+## Gemini
 
 ### Client Setup
 
 ```typescript
 // backend/src/agent/ — server-side only
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenAI } from "@google/genai";
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY!,
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY!,
 });
 ```
 
-Never import the Anthropic client in `frontend/` — the API key is secret.
+Never import the Gemini client in `frontend/` — the API key is secret.
+
+---
+
+### Model
+
+- **Model**: `gemini-3.5-flash` — 1M token context, fast, free tier available
+- Used for all three agent tasks: resume scoring, cover letter generation, resume tailoring
 
 ---
 
 ### Resume Scoring Call — 8-Section Prompt
 
-This is the core AI feature. A single Claude call returns all 8 sections as one JSON object.
+A single Gemini call returns all 8 sections as one JSON object.
 
 ```typescript
 // backend/src/agent/scorer.ts
-const response = await anthropic.messages.create({
-  model: "claude-sonnet-4-20250514",
-  max_tokens: 4096,
-  messages: [
-    {
-      role: "user",
-      content: buildScoringPrompt(resumeText, jobDescription),
-    },
-  ],
+const response = await ai.models.generateContent({
+  model: "gemini-3.5-flash",
+  contents: buildScoringPrompt(resumeText, jobDescription),
+  config: { maxOutputTokens: 4096 },
 });
 
-const text = response.content[0].type === "text" ? response.content[0].text : "";
+const text = response.text;
 const result: ScoreResult = JSON.parse(text);
-```
-
-**Prompt template (`buildScoringPrompt`):**
-
-```
-Analyze the match between this resume and the job description below.
-
-Return ONLY valid JSON matching this exact shape — no markdown, no preamble:
-
-{
-  "overall_score": number (0-100),
-  "keyword_score": number (0-100),
-  "ats_score": number (0-100),
-  "impact_score": number (0-100),
-  "readability_score": number (0-100),
-  "skills_match": [
-    { "skill": string, "matchPercent": number (0-100) }
-  ],
-  "pros": [string],
-  "cons": [string],
-  "missing_keywords": [
-    { "keyword": string, "suggestion": string }
-  ],
-  "improvements": [
-    { "tag": "ADD" | "REPHRASE" | "FORMAT", "text": string }
-  ],
-  "sample_resume_text": string
-}
-
-Instructions for each field:
-
-1. skills_match — Compare skills listed in the resume against the job requirements. For each relevant skill, give a percentage match reflecting how well the candidate's experience aligns.
-
-2. pros — Identify key strengths of the resume related to this position: areas where skills and experience align well with the job requirements.
-
-3. cons — Identify weaknesses or gaps in the resume that may need attention, especially areas where the position requires skills or experience that are underrepresented or missing.
-
-4. missing_keywords — Extract the top 15 key terms or phrases from the job description that are missing from the resume. For each, provide a brief suggestion on how to integrate it naturally.
-
-5. improvements — Actionable suggestions to enhance the resume for this job. Each suggestion must be realistic and based on the resume's existing information — never invent experience the candidate doesn't have. Tag each suggestion as ADD (missing content to add), REPHRASE (existing content to reword), or FORMAT (structural/ATS formatting fix).
-
-6. overall_score — A single percentage reflecting how well the resume demonstrates the skills, experience, and qualifications required for this specific job, considering both technical and soft skills.
-
-7. sample_resume_text — A complete sample resume using the candidate's real information from the resume provided, written to be ATS-friendly and suitable for the international job market. Do not invent experience, employers, or credentials that are not present in the original resume — only rephrase, reorganize, and emphasize what is already there.
-
-RESUME:
-{resumeText}
-
-JOB DESCRIPTION:
-{jobDescription}
 ```
 
 **Rules:**
 
-- Always include "Return ONLY valid JSON" with no markdown fencing — never use regex to strip code blocks, instruct Claude not to produce them
+- Always include "Return ONLY valid JSON" with no markdown fencing — never use regex to strip code blocks, instruct Gemini not to produce them
 - Always wrap `JSON.parse` in try/catch — if parsing fails, log to `agent_logs` and return `{ success: false, error: "Failed to parse AI response" }`
-- `sample_resume_text` must never invent employers, credentials, or experience — the prompt explicitly forbids this and the agent must not post-process to add anything
-- `missing_keywords` is always capped at 15 items — if Claude returns more, slice to 15; if fewer, accept as-is
+- `sample_resume_text` must never invent employers, credentials, or experience — the prompt explicitly forbids this
+- `missing_keywords` is always capped at 15 items
 
 ---
 
@@ -243,21 +195,16 @@ JOB DESCRIPTION:
 
 ```typescript
 // backend/src/agent/cover-letter.ts
-const response = await anthropic.messages.create({
-  model: "claude-sonnet-4-20250514",
-  max_tokens: 800,
-  messages: [
-    {
-      role: "user",
-      content: buildCoverLetterPrompt(resumeText, jobDescription, company, role),
-    },
-  ],
+const response = await ai.models.generateContent({
+  model: "gemini-3.5-flash",
+  contents: buildCoverLetterPrompt(resumeText, jobDescription, company, role),
+  config: { maxOutputTokens: 800 },
 });
 
-const coverLetter = response.content[0].type === "text" ? response.content[0].text : "";
+const coverLetter = response.text.trim();
 ```
 
-Cover letter is plain text — no JSON wrapper. 3–4 paragraphs. Prompt instructs Claude to write a cover letter suitable for the international job market, matching the company's tone inferred from the job description, and grounding every claim in the candidate's actual resume content.
+Cover letter is plain text — no JSON wrapper. 3–4 paragraphs.
 
 ---
 
@@ -265,35 +212,30 @@ Cover letter is plain text — no JSON wrapper. 3–4 paragraphs. Prompt instruc
 
 ```typescript
 // backend/src/agent/resume-tailor.ts
-const response = await anthropic.messages.create({
-  model: "claude-sonnet-4-20250514",
-  max_tokens: 1500,
-  messages: [
-    {
-      role: "user",
-      content: buildTailorPrompt(resumeText, jobDescription),
-    },
-  ],
+const response = await ai.models.generateContent({
+  model: "gemini-3.5-flash",
+  contents: buildTailorPrompt(resumeText, jobDescription),
+  config: { maxOutputTokens: 1500 },
 });
 ```
 
-This may reuse `sample_resume_text` from the most recent `resume_scores` row if it already exists and the job description hasn't changed — avoid a redundant Claude call. Only call this agent fresh if no `sample_resume_text` exists yet for the current score.
+This may reuse `sample_resume_text` from the most recent `resume_scores` row if it already exists and the job description hasn't changed — avoid a redundant Gemini call.
 
 ---
 
 ### Model and Token Settings
 
-| Use case                  | Model                        | max_tokens | Notes                              |
-| -------------------------- | ----------------------------- | ---------- | ------------------------------------ |
-| Resume scoring (8 sections)| `claude-sonnet-4-20250514`   | 4096       | Large structured JSON output         |
-| Cover letter               | `claude-sonnet-4-20250514`   | 800        | Plain text output                    |
-| Tailored resume content    | `claude-sonnet-4-20250514`   | 1500       | Plain text, formatted for PDF render |
+| Use case                  | Model               | max_tokens | Notes                              |
+| -------------------------- | ------------------- | ---------- | ------------------------------------ |
+| Resume scoring (8 sections)| `gemini-3.5-flash` | 4096       | Large structured JSON output         |
+| Cover letter               | `gemini-3.5-flash` | 800        | Plain text output                    |
+| Tailored resume content    | `gemini-3.5-flash` | 1500       | Plain text, formatted for PDF render |
 
 **Rules:**
 
-- Model string is always `'claude-sonnet-4-20250514'` — never use other model names
+- Model is always `'gemini-3.5-flash'` — never use other model names
 - Always validate parsed JSON before using — wrap `JSON.parse` in try/catch
-- Always check `response.content[0].type === 'text'` before accessing `.text`
+- Always check `response.text` is non-empty before using
 - Score threshold is always `SCORE_THRESHOLD` from `lib/utils.ts` — never hardcode 75
 - Scoring must always return all 8 sections — if a section is genuinely empty (e.g. no missing keywords found), return an empty array `[]`, never omit the key
 

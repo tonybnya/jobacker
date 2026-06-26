@@ -1,7 +1,7 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenAI } from "@google/genai";
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY ?? "",
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY ?? "",
 });
 
 function buildCoverLetterPrompt(
@@ -32,23 +32,18 @@ export async function generateCoverLetter(
   role: string,
 ): Promise<{ success: true; text: string } | { success: false; error: string }> {
   try {
-    const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 800,
-      messages: [
-        {
-          role: "user",
-          content: buildCoverLetterPrompt(resumeText, jobDescription, company, role),
-        },
-      ],
+    const response = await ai.models.generateContent({
+      model: "gemini-3.5-flash",
+      contents: buildCoverLetterPrompt(resumeText, jobDescription, company, role),
+      config: { maxOutputTokens: 800 },
     });
 
-    const block = response.content[0];
-    if (block.type !== "text") {
-      return { success: false, error: "Unexpected response format from AI" };
+    const text = response.text;
+    if (!text) {
+      return { success: false, error: "Empty response from AI" };
     }
 
-    return { success: true, text: block.text.trim() };
+    return { success: true, text: text.trim() };
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
     return { success: false, error: `Cover letter generation failed: ${message}` };

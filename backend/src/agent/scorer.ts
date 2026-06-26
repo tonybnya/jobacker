@@ -1,7 +1,7 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenAI } from "@google/genai";
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY ?? "",
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY ?? "",
 });
 
 function buildScoringPrompt(resumeText: string, jobDescription: string): string {
@@ -71,20 +71,20 @@ export async function scoreResume(
   jobDescription: string,
 ): Promise<{ success: true; result: ScorerResult } | { success: false; error: string }> {
   try {
-    const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 4096,
-      messages: [{ role: "user", content: buildScoringPrompt(resumeText, jobDescription) }],
+    const response = await ai.models.generateContent({
+      model: "gemini-3.5-flash",
+      contents: buildScoringPrompt(resumeText, jobDescription),
+      config: { maxOutputTokens: 4096 },
     });
 
-    const block = response.content[0];
-    if (block.type !== "text") {
-      return { success: false, error: "Unexpected response format from AI" };
+    const text = response.text;
+    if (!text) {
+      return { success: false, error: "Empty response from AI" };
     }
 
     let parsed: ScorerResult;
     try {
-      parsed = JSON.parse(block.text) as ScorerResult;
+      parsed = JSON.parse(text) as ScorerResult;
     } catch {
       return { success: false, error: "Failed to parse AI response" };
     }

@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Toaster } from "sonner";
 import { LandingPage } from "@/pages/LandingPage";
 import { LoginPage } from "@/pages/LoginPage";
 import { AuthCallbackPage } from "@/pages/AuthCallbackPage";
@@ -24,6 +25,19 @@ function AppLayout({ children }: { children: React.ReactNode }) {
 export function App() {
   return (
     <BrowserRouter>
+      <Toaster
+        position="bottom-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: "rgba(28, 25, 23, 0.95)",
+            border: "1px solid rgba(41, 37, 36, 0.8)",
+            color: "#d6d3d1",
+            fontSize: "13px",
+            borderRadius: "10px",
+          },
+        }}
+      />
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />

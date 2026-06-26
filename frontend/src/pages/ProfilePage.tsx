@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "sonner";
 import { Edit01Icon } from "hugeicons-react";
 import { useProfile } from "@/hooks/useProfile";
 import { CompletionBanner } from "@/components/profile/CompletionBanner";
@@ -52,7 +53,7 @@ export function ProfilePage() {
       <div className="mt-6 space-y-6">
         <div className="glass divide-y divide-border">
           <div className="px-5 py-5">
-            <ProfileFormFields profile={profile} editing={editing} saving={saving} onSave={saveProfile} />
+            <ProfileFormFields profile={profile} editing={editing} saving={saving} onSave={saveProfile} onSaved={() => setEditing(false)} />
           </div>
         </div>
 
@@ -77,11 +78,13 @@ function ProfileFormFields({
   editing,
   saving,
   onSave,
+  onSaved,
 }: {
   profile: Profile;
   editing: boolean;
   saving: boolean;
   onSave: (updates: Partial<Pick<Profile, "full_name" | "phone" | "location">>) => Promise<boolean>;
+  onSaved: () => void;
 }) {
   const [fullName, setFullName] = useState(profile.full_name ?? "");
   const [phone, setPhone] = useState(profile.phone ?? "");
@@ -90,7 +93,10 @@ function ProfileFormFields({
   const handleSave = async () => {
     const ok = await onSave({ full_name: fullName, phone, location });
     if (ok) {
-      // Collapse edit mode — parent will re-render with updated profile
+      toast.success("Profile saved");
+      onSaved();
+    } else {
+      toast.error("Failed to save profile");
     }
   };
 

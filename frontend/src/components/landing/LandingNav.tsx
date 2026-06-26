@@ -26,12 +26,12 @@ export function LandingNav() {
         scrolled ? 'glass border-b border-border' : ''
       }`}
     >
-      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-14">
+      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-14 relative">
         <div className="flex items-center gap-2">
           <img src={logo} alt="Jobacker" className="w-6 h-6 rounded object-cover" />
           <span className="font-mono text-sm font-semibold tracking-tight text-text">JOBACKER</span>
         </div>
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
           {['Features', 'How it works'].map((item) => {
             const anchor = item.toLowerCase().replace(/\s+/g, '-')
             return (

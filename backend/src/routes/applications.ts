@@ -9,6 +9,8 @@ import {
   updateApplication,
   deleteApplication,
   getLatestScore,
+  createResumeScore,
+  writeAgentLog,
 } from "@/lib/insforge";
 
 const router = Router();
@@ -27,6 +29,20 @@ const createSchema = z.object({
   follow_up_count: z.number().int().min(0).optional(),
   notes: z.string().optional(),
   job_description: z.string().optional(),
+  score_data: z.object({
+    overall_score: z.number(),
+    keyword_score: z.number(),
+    ats_score: z.number(),
+    impact_score: z.number(),
+    readability_score: z.number(),
+    skills_match: z.array(z.object({ skill: z.string(), match_percent: z.number() })),
+    pros: z.array(z.string()),
+    cons: z.array(z.string()),
+    missing_keywords: z.array(z.object({ keyword: z.string(), suggestion: z.string() })),
+    improvements: z.array(z.object({ tag: z.enum(["ADD", "REPHRASE", "FORMAT"]), text: z.string() })),
+    sample_resume_text: z.string(),
+  }).optional(),
+  cover_letter: z.string().optional().nullable(),
 });
 
 const updateSchema = z.object({
@@ -52,7 +68,7 @@ router.get("/", async (req: Request, res: Response) => {
     const sort = req.query.sort as string | undefined;
     const page = req.query.page ? Number(req.query.page) : 1;
 
-    const { data, error, total } = await getApplications(token, req.user!.id, {
+    const result = await getApplications(token, req.user!.id, {
       search,
       status,
       type,
@@ -61,9 +77,16 @@ router.get("/", async (req: Request, res: Response) => {
       pageSize: 20,
     });
 
-    if (error) return res.status(500).json({ success: false, error });
+    console.log("[applications] GET / result:", {
+      userId: req.user!.id,
+      dataCount: result.data?.length ?? 0,
+      total: result.total,
+      error: result.error,
+    });
 
-    return res.json({ success: true, data, total, page, pageSize: 20 });
+    if (result.error) return res.status(500).json({ success: false, error: result.error });
+
+    return res.json({ success: true, data: result.data, total: result.total, page, pageSize: 20 });
   } catch (err) {
     return res.status(500).json({ success: false, error: "Internal server error" });
   }
@@ -94,8 +117,30 @@ router.post("/", async (req: Request, res: Response) => {
     if (profileError && !profileError.includes("duplicate key")) {
       return res.status(500).json({ success: false, error: profileError });
     }
-    const { data, error } = await createApplication(token, userId, parsed.data);
+
+    const { score_data, cover_letter, ...appData } = parsed.data;
+    const { data, error } = await createApplication(token, userId, appData);
+    console.log("[applications] create result:", { data: data ?? null, error });
     if (error) return res.status(500).json({ success: false, error });
+    if (!data) return res.status(500).json({ success: false, error: "No data returned from database" });
+
+    if (data && score_data) {
+      const scorePayload: Record<string, unknown> = {
+        application_id: data.id,
+        user_id: userId,
+        ...score_data,
+        cover_letter: cover_letter ?? null,
+      };
+      const scoreResult = await createResumeScore(token, scorePayload);
+      if (scoreResult.data) {
+        await updateApplication(token, data.id, userId, {
+          latest_score_id: scoreResult.data.id,
+        });
+        return res.status(201).json({ success: true, data: { ...data, latest_score_id: scoreResult.data.id } });
+      }
+      await writeAgentLog(token, { application_id: data.id, user_id: userId, action: "score", error: "Failed to save score during creation" });
+    }
+
     return res.status(201).json({ success: true, data });
   } catch (err) {
     return res.status(500).json({ success: false, error: "Internal server error" });

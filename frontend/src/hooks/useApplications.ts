@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { apiFetch } from "@/lib/api-client";
-import type { Application, ApplicationStatus, ApplicationType } from "@/types";
+import type { Application } from "@/types";
 
 export interface ApplicationsFilters {
   search: string;
@@ -36,6 +36,7 @@ export function useApplications(): UseApplicationsReturn {
     sort: "newest",
     page: 1,
   });
+  const [version, setVersion] = useState(0);
   const abortRef = useRef<AbortController | null>(null);
 
   const setFilters = useCallback((f: Partial<ApplicationsFilters>) => {
@@ -47,7 +48,8 @@ export function useApplications(): UseApplicationsReturn {
     const controller = new AbortController();
     abortRef.current = controller;
 
-    setLoading(true);
+    const isInitial = applications.length === 0;
+    if (isInitial) setLoading(true);
     const params = new URLSearchParams();
     if (filters.search) params.set("search", filters.search);
     if (filters.status !== "all") params.set("status", filters.status);
@@ -58,10 +60,12 @@ export function useApplications(): UseApplicationsReturn {
     apiFetch<Application[]>(`/applications?${params.toString()}`)
       .then((res) => {
         if (controller.signal.aborted) return;
-        if (res.success && res.data) {
+        if (res.success && Array.isArray(res.data)) {
           setApplications(res.data);
           setTotal("total" in res && typeof (res as Record<string, unknown>).total === "number" ? (res as Record<string, unknown>).total as number : res.data.length);
           setPage(filters.page);
+        } else {
+          console.error("[useApplications] fetch failed:", res.error);
         }
       })
       .finally(() => {
@@ -69,7 +73,7 @@ export function useApplications(): UseApplicationsReturn {
       });
 
     return () => controller.abort();
-  }, [filters]);
+  }, [filters, version]);
 
   const createApplication = useCallback(async (data: Partial<Application>) => {
     const res = await apiFetch<Application>("/applications", {
@@ -79,8 +83,10 @@ export function useApplications(): UseApplicationsReturn {
     if (res.success && res.data) {
       setApplications((prev) => [res.data!, ...prev]);
       setTotal((t) => t + 1);
+      setVersion((v) => v + 1);
       return res.data;
     }
+    console.error("[useApplications] create failed:", res.error);
     return null;
   }, []);
 
@@ -90,7 +96,7 @@ export function useApplications(): UseApplicationsReturn {
       body: JSON.stringify(data),
     });
     if (res.success && res.data) {
-      setApplications((prev) => prev.map((a) => (a.id === id ? res.data! : a)));
+      setVersion((v) => v + 1);
       return res.data;
     }
     return null;
@@ -99,8 +105,7 @@ export function useApplications(): UseApplicationsReturn {
   const deleteApplication = useCallback(async (id: string) => {
     const res = await apiFetch(`/applications/${id}`, { method: "DELETE" });
     if (res.success) {
-      setApplications((prev) => prev.filter((a) => a.id !== id));
-      setTotal((t) => t - 1);
+      setVersion((v) => v + 1);
       return true;
     }
     return false;

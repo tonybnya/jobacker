@@ -10,6 +10,46 @@ const router = Router();
 
 router.use(requireAuth);
 
+router.post("/preview-score", async (req: Request, res: Response) => {
+  try {
+    const { jobDescription } = req.body as { jobDescription?: string };
+    if (!jobDescription) {
+      return res.status(400).json({ success: false, error: "jobDescription is required" });
+    }
+    const token = req.headers.authorization!.slice(7);
+    const profileResult = await getProfile(token, req.user!.id);
+    if (!profileResult.data?.resume_text) {
+      return res.status(400).json({ success: false, error: "Please upload your base resume in your profile first." });
+    }
+    const [scoreResult, coverLetterResult] = await Promise.all([
+      scoreResume(profileResult.data.resume_text, jobDescription),
+      generateCoverLetter(profileResult.data.resume_text, jobDescription, "", ""),
+    ]);
+    if (!scoreResult.success) {
+      return res.status(500).json({ success: false, error: scoreResult.error });
+    }
+    return res.json({
+      success: true,
+      score: {
+        overall_score: scoreResult.result.overall_score,
+        keyword_score: scoreResult.result.keyword_score,
+        ats_score: scoreResult.result.ats_score,
+        impact_score: scoreResult.result.impact_score,
+        readability_score: scoreResult.result.readability_score,
+        skills_match: scoreResult.result.skills_match.map((s) => ({ skill: s.skill, match_percent: s.matchPercent })),
+        pros: scoreResult.result.pros,
+        cons: scoreResult.result.cons,
+        missing_keywords: scoreResult.result.missing_keywords,
+        improvements: scoreResult.result.improvements,
+        sample_resume_text: scoreResult.result.sample_resume_text,
+      },
+      cover_letter: coverLetterResult.success ? coverLetterResult.text : null,
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err instanceof Error ? err.message : "Unknown error" });
+  }
+});
+
 router.post("/score", async (req: Request, res: Response) => {
   try {
     const { applicationId } = req.body as { applicationId?: string };

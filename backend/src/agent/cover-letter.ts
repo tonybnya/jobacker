@@ -33,14 +33,18 @@ export async function generateCoverLetter(
 ): Promise<{ success: true; text: string } | { success: false; error: string }> {
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
+      model: "gemini-2.5-flash",
       contents: buildCoverLetterPrompt(resumeText, jobDescription, company, role),
-      config: { maxOutputTokens: 800 },
+      config: { maxOutputTokens: 2048 },
     });
 
     const text = response.text;
     if (!text) {
-      return { success: false, error: "Empty response from AI" };
+      const candidate = response.candidates?.[0];
+      const finishReason = candidate?.finishReason;
+      const blockReason = response.promptFeedback?.blockReason;
+      const detail = finishReason ? ` (finishReason: ${finishReason})` : blockReason ? ` (blockReason: ${blockReason})` : "";
+      return { success: false, error: `Empty response from AI${detail}` };
     }
 
     return { success: true, text: text.trim() };

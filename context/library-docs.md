@@ -161,7 +161,7 @@ Never import the Gemini client in `frontend/` — the API key is secret.
 
 ### Model
 
-- **Model**: `gemini-3.5-flash` — 1M token context, fast, free tier available
+- **Model**: `gemini-2.5-flash` — 1M token context, fast, free tier available
 - Used for all three agent tasks: resume scoring, cover letter generation, resume tailoring
 
 ---
@@ -227,13 +227,13 @@ This may reuse `sample_resume_text` from the most recent `resume_scores` row if 
 
 | Use case                  | Model               | max_tokens | Notes                              |
 | -------------------------- | ------------------- | ---------- | ------------------------------------ |
-| Resume scoring (8 sections)| `gemini-3.5-flash` | 4096       | Large structured JSON output         |
-| Cover letter               | `gemini-3.5-flash` | 800        | Plain text output                    |
-| Tailored resume content    | `gemini-3.5-flash` | 1500       | Plain text, formatted for PDF render |
+| Resume scoring (8 sections)| `gemini-2.5-flash` | 4096       | Large structured JSON output         |
+| Cover letter               | `gemini-2.5-flash` | 800        | Plain text output                    |
+| Tailored resume content    | `gemini-2.5-flash` | 1500       | Plain text, formatted for PDF render |
 
 **Rules:**
 
-- Model is always `'gemini-3.5-flash'` — never use other model names
+- Model is always `'gemini-2.5-flash'` — never use other model names
 - Always validate parsed JSON before using — wrap `JSON.parse` in try/catch
 - Always check `response.text` is non-empty before using
 - Score threshold is always `SCORE_THRESHOLD` from `lib/utils.ts` — never hardcode 75

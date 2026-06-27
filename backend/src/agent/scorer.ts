@@ -5,45 +5,28 @@ const ai = new GoogleGenAI({
 });
 
 function buildScoringPrompt(resumeText: string, jobDescription: string): string {
-  return `Analyze the match between this resume and the job description below.
+  return `You are a resume scoring AI. Analyze the match between this resume and the job description.
 
-Return ONLY valid JSON matching this exact shape — no markdown, no preamble:
+Return ONLY valid JSON with no markdown formatting, no preamble, no explanation.
 
+Required JSON structure — escape all quotes and newlines inside strings properly:
 {
-  "overall_score": number (0-100),
-  "keyword_score": number (0-100),
-  "ats_score": number (0-100),
-  "impact_score": number (0-100),
-  "readability_score": number (0-100),
-  "skills_match": [
-    { "skill": string, "matchPercent": number (0-100) }
-  ],
-  "pros": [string],
-  "cons": [string],
-  "missing_keywords": [
-    { "keyword": string, "suggestion": string }
-  ],
-  "improvements": [
-    { "tag": "ADD" | "REPHRASE" | "FORMAT", "text": string }
-  ],
-  "sample_resume_text": string
+  "overall_score": <0-100>,
+  "keyword_score": <0-100>,
+  "ats_score": <0-100>,
+  "impact_score": <0-100>,
+  "readability_score": <0-100>,
+  "skills_match": [{ "skill": "...", "matchPercent": <0-100> }],
+  "pros": ["...", "..."],
+  "cons": ["...", "..."],
+  "missing_keywords": [{ "keyword": "...", "suggestion": "..." }],
+  "improvements": [{ "tag": "ADD", "text": "..." }],
+  "sample_resume_text": "rewritten resume here — escape all inner quotes with backslash, replace newlines with \\n"
 }
 
-Instructions for each field:
-
-1. skills_match — Compare skills listed in the resume against the job requirements. For each relevant skill, give a percentage match reflecting how well the candidate's experience aligns.
-
-2. pros — Identify key strengths of the resume related to this position: areas where skills and experience align well with the job requirements.
-
-3. cons — Identify weaknesses or gaps in the resume that may need attention, especially areas where the position requires skills or experience that are underrepresented or missing.
-
-4. missing_keywords — Extract the top 15 key terms or phrases from the job description that are missing from the resume. For each, provide a brief suggestion on how to integrate it naturally.
-
-5. improvements — Actionable suggestions to enhance the resume for this job. Each suggestion must be realistic and based on the resume's existing information — never invent experience the candidate doesn't have. Tag each suggestion as ADD (missing content to add), REPHRASE (existing content to reword), or FORMAT (structural/ATS formatting fix).
-
-6. overall_score — A single percentage reflecting how well the resume demonstrates the skills, experience, and qualifications required for this specific job, considering both technical and soft skills.
-
-7. sample_resume_text — A complete sample resume using the candidate's real information from the resume provided, written to be ATS-friendly and suitable for the international job market. Do not invent experience, employers, or credentials that are not present in the original resume — only rephrase, reorganize, and emphasize what is already there.
+Important: For sample_resume_text, use real info from the resume only.
+Escape all double quotes inside strings with backslash.
+Do not include actual newlines in JSON string values — use \\n instead.
 
 RESUME:
 ${resumeText}
@@ -72,21 +55,44 @@ export async function scoreResume(
 ): Promise<{ success: true; result: ScorerResult } | { success: false; error: string }> {
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
+      model: "gemini-2.5-flash",
       contents: buildScoringPrompt(resumeText, jobDescription),
-      config: { maxOutputTokens: 4096 },
+      config: {
+        maxOutputTokens: 8192,
+        responseMimeType: "application/json",
+      },
     });
 
     const text = response.text;
     if (!text) {
-      return { success: false, error: "Empty response from AI" };
+      const candidate = response.candidates?.[0];
+      const finishReason = candidate?.finishReason;
+      const blockReason = response.promptFeedback?.blockReason;
+      const detail = finishReason ? ` (finishReason: ${finishReason})` : blockReason ? ` (blockReason: ${blockReason})` : "";
+      return { success: false, error: `Empty response from AI${detail}` };
     }
 
     let parsed: ScorerResult;
+    let cleanText = text.trim();
+
+    const jsonMatch = cleanText.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (jsonMatch) {
+      cleanText = jsonMatch[1].trim();
+    }
+
+    const braceIdx = cleanText.indexOf("{");
+    const lastBraceIdx = cleanText.lastIndexOf("}");
+    if (braceIdx !== -1 && lastBraceIdx > braceIdx) {
+      cleanText = cleanText.slice(braceIdx, lastBraceIdx + 1);
+    }
+
     try {
-      parsed = JSON.parse(text) as ScorerResult;
-    } catch {
-      return { success: false, error: "Failed to parse AI response" };
+      parsed = JSON.parse(cleanText) as ScorerResult;
+    } catch (parseErr) {
+      console.error("[scorer] raw text:", text.slice(0, 1000));
+      console.error("[scorer] parse error:", parseErr instanceof Error ? parseErr.message : String(parseErr));
+      console.error("[scorer] clean text:", cleanText.slice(0, 1000));
+      return { success: false, error: `Failed to parse AI response: ${parseErr instanceof Error ? parseErr.message : "Invalid JSON"}` };
     }
 
     if (typeof parsed.overall_score !== "number") {

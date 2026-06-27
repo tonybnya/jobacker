@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { AiMagicIcon, Award01Icon } from "hugeicons-react";
 import type { Application, ApplicationStatus, ApplicationType } from "@/types";
 
 const STATUSES: { value: ApplicationStatus; label: string }[] = [
@@ -19,6 +20,20 @@ const TYPES: { value: ApplicationType; label: string }[] = [
   { value: "internship", label: "Internship" },
   { value: "contract", label: "Contract" },
 ];
+
+interface PreviewScore {
+  overall_score: number;
+  keyword_score: number;
+  ats_score: number;
+  impact_score: number;
+  readability_score: number;
+  skills_match: Array<{ skill: string; matchPercent: number }>;
+  pros: string[];
+  cons: string[];
+  missing_keywords: Array<{ keyword: string; suggestion: string }>;
+  improvements: Array<{ tag: "ADD" | "REPHRASE" | "FORMAT"; text: string }>;
+  sample_resume_text: string;
+}
 
 interface ApplicationModalProps {
   open: boolean;
@@ -41,6 +56,11 @@ export function ApplicationModal({ open, onClose, onSave, application }: Applica
   const [jobDescription, setJobDescription] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [scoring, setScoring] = useState(false);
+  const [scored, setScored] = useState(false);
+  const [previewScore, setPreviewScore] = useState<PreviewScore | null>(null);
+  const [previewCoverLetter, setPreviewCoverLetter] = useState<string | null>(null);
 
   const isEdit = application?.id !== undefined;
 
@@ -72,8 +92,48 @@ export function ApplicationModal({ open, onClose, onSave, application }: Applica
         setJobDescription("");
       }
       setError(null);
+      setScored(false);
+      setPreviewScore(null);
+      setPreviewCoverLetter(null);
     }
   }, [open, application]);
+
+  const handlePreviewScore = async () => {
+    if (!jobDescription.trim()) {
+      setError("Paste the job description before scoring");
+      return;
+    }
+    if (!company.trim() || !role.trim()) {
+      setError("Company and Role are required before scoring");
+      return;
+    }
+    setScoring(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem("insforge_token");
+      const API_BASE = import.meta.env.VITE_API_BASE_URL;
+      const res = await fetch(`${API_BASE}/agent/preview-score`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ jobDescription: jobDescription.trim() }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setPreviewScore(data.score);
+        setPreviewCoverLetter(data.cover_letter);
+        setScored(true);
+      } else {
+        setError(data.error ?? "Scoring failed");
+      }
+    } catch {
+      setError("Network error. Please try again.");
+    } finally {
+      setScoring(false);
+    }
+  };
 
   const handleSave = async () => {
     if (!company.trim() || !role.trim()) {
@@ -94,6 +154,12 @@ export function ApplicationModal({ open, onClose, onSave, application }: Applica
       follow_up_count: followUpCount,
       notes: notes.trim() || undefined,
       job_description: jobDescription.trim() || undefined,
+      ...(scored && previewScore
+        ? {
+            score_data: previewScore,
+            cover_letter: previewCoverLetter || undefined,
+          }
+        : {}),
     });
     setSaving(false);
     if (result) {
@@ -102,6 +168,16 @@ export function ApplicationModal({ open, onClose, onSave, application }: Applica
       setError("Failed to save application");
     }
   };
+
+  function ScoreBadge({ value, label }: { value: number; label: string }) {
+    const color = value >= 80 ? "text-green-400" : value >= 60 ? "text-amber-400" : "text-red-400";
+    return (
+      <div className="flex flex-col items-center rounded-lg bg-surface-light px-3 py-2">
+        <span className={`text-lg font-bold ${color}`}>{value}</span>
+        <span className="text-[10px] text-text-dim">{label}</span>
+      </div>
+    );
+  }
 
   return (
     <AnimatePresence>
@@ -256,17 +332,95 @@ export function ApplicationModal({ open, onClose, onSave, application }: Applica
                 <div>
                   <label className="mb-1 block text-[10px] font-mono font-medium text-text-muted">
                     Job Description
+                    <span className="ml-1.5 text-status-rejected">*</span>
                     <span className="ml-1 text-text-dim">(for scoring)</span>
                   </label>
                   <textarea
                     value={jobDescription}
-                    onChange={(e) => setJobDescription(e.target.value)}
+                    onChange={(e) => {
+                      setJobDescription(e.target.value);
+                      if (scored) {
+                        setScored(false);
+                        setPreviewScore(null);
+                        setPreviewCoverLetter(null);
+                      }
+                    }}
                     rows={4}
                     placeholder="Paste the job description here..."
                     className="w-full resize-none rounded-lg border border-border bg-surface px-3 py-2 text-xs text-text outline-none placeholder:text-text-dim focus:border-amber"
                   />
                 </div>
               </div>
+
+              {!isEdit && jobDescription.trim() && !scored && (
+                <button
+                  type="button"
+                  onClick={handlePreviewScore}
+                  disabled={scoring}
+                  className="mt-4 flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-amber/20 px-5 py-2.5 text-xs font-medium text-amber transition-all hover:bg-amber/30 disabled:opacity-50"
+                >
+                  {scoring ? (
+                    <>
+                      <svg className="h-3.5 w-3.5 animate-spin" viewBox="0 0 24 24" fill="none">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                      Scoring...
+                    </>
+                  ) : (
+                    <>
+                      <AiMagicIcon className="h-3.5 w-3.5" />
+                      Score & Review
+                    </>
+                  )}
+                </button>
+              )}
+
+              {previewScore && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-4 space-y-3 rounded-lg border border-amber/20 bg-amber/[0.03] p-4"
+                >
+                  <div className="mb-3 flex items-center gap-2">
+                    <Award01Icon className="h-4 w-4 text-amber" />
+                    <span className="text-xs font-medium text-amber">Match Analysis</span>
+                  </div>
+
+                  <div className="grid grid-cols-5 gap-2">
+                    <ScoreBadge value={previewScore.overall_score} label="Overall" />
+                    <ScoreBadge value={previewScore.keyword_score} label="Keywords" />
+                    <ScoreBadge value={previewScore.ats_score} label="ATS" />
+                    <ScoreBadge value={previewScore.impact_score} label="Impact" />
+                    <ScoreBadge value={previewScore.readability_score} label="Readability" />
+                  </div>
+
+                  {previewScore.improvements.length > 0 && (
+                    <div>
+                      <p className="mb-1.5 text-[10px] font-mono font-medium text-text-muted">Improvements</p>
+                      <ul className="space-y-1">
+                        {previewScore.improvements.slice(0, 4).map((imp, i) => (
+                          <li key={i} className="flex items-start gap-1.5 text-[11px] text-text-dim">
+                            <span className={`mt-0.5 shrink-0 rounded px-1 py-px text-[9px] font-mono font-medium ${
+                              imp.tag === "ADD" ? "bg-green-900/30 text-green-400" :
+                              imp.tag === "REPHRASE" ? "bg-amber-900/30 text-amber-400" :
+                              "bg-blue-900/30 text-blue-400"
+                            }`}>{imp.tag}</span>
+                            <span>{imp.text}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {previewCoverLetter && (
+                    <div>
+                      <p className="mb-1.5 text-[10px] font-mono font-medium text-text-muted">Cover Letter Preview</p>
+                      <p className="text-[11px] leading-relaxed text-text-dim line-clamp-3">{previewCoverLetter}</p>
+                    </div>
+                  )}
+                </motion.div>
+              )}
 
               {error && (
                 <p className="mt-3 text-xs text-status-rejected">{error}</p>
@@ -286,7 +440,7 @@ export function ApplicationModal({ open, onClose, onSave, application }: Applica
                   disabled={saving}
                   className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-amber px-5 py-2 text-xs font-medium text-primary transition-opacity hover:opacity-90 disabled:opacity-50"
                 >
-                  {saving ? "Saving..." : "Save"}
+                  {saving ? "Saving..." : isEdit ? "Update" : "Log Application"}
                 </button>
               </div>
             </div>

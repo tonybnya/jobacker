@@ -22,11 +22,13 @@ export async function getUserFromToken(token: string) {
 
 const DB_URL = `${process.env.INSFORGE_URL}/api/database/records`;
 
-async function dbFetch<T>(
+export type DBResult<T> = { data: T | null; error: string | null };
+
+export async function dbFetch<T>(
   path: string,
   token: string,
   options?: RequestInit,
-): Promise<{ data: T | null; error: string | null }> {
+): Promise<DBResult<T>> {
   try {
     const res = await fetch(`${DB_URL}${path}`, {
       ...options,
@@ -89,7 +91,6 @@ export function getApplications(
   const sortOrder = opts.sort === "oldest" ? "asc" : "desc";
 
   const qs = buildQueryString({
-    select: "*",
     user_id: `eq.${userId}`,
     ...(opts.search ? { or: `(company.ilike.*${opts.search}*,role.ilike.*${opts.search}*)` } : {}),
     ...(opts.status && opts.status !== "all" ? { status: `eq.${opts.status}` } : {}),
@@ -102,13 +103,20 @@ export function getApplications(
   return dbFetch<Application[]>(`/applications?select=*${qs}`, token).then(async (r) => {
     let total = 0;
     try {
+      const countQs = buildQueryString({
+        user_id: `eq.${userId}`,
+        ...(opts.status && opts.status !== "all" ? { status: `eq.${opts.status}` } : {}),
+        ...(opts.type && opts.type !== "all" ? { type: `eq.${opts.type}` } : {}),
+      });
       const countRes = await fetch(
-        `${DB_URL}/applications?select=id&user_id=eq.${userId}${opts.status && opts.status !== "all" ? `&status=eq.${opts.status}` : ""}${opts.type && opts.type !== "all" ? `&type=eq.${opts.type}` : ""}`,
+        `${DB_URL}/applications?select=id${countQs}`,
         { headers: { Authorization: `Bearer ${token}`, Accept: "application/json" } },
       );
       const countBody = await countRes.json();
       total = Array.isArray(countBody) ? countBody.length : 0;
-    } catch {}
+    } catch (e) {
+      console.error("[insforge] count query failed:", e);
+    }
     return { data: r.data ?? [], error: r.error, total, page, pageSize };
   });
 }

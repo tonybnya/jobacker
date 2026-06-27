@@ -4,6 +4,7 @@ import { z } from "zod";
 import {
   getApplications,
   getApplication,
+  getProfile,
   createApplication,
   createProfile,
   updateApplication,
@@ -109,13 +110,24 @@ router.post("/", async (req: Request, res: Response) => {
   try {
     const parsed = createSchema.safeParse(req.body);
     if (!parsed.success) {
-      return res.status(400).json({ success: false, error: parsed.error.flatten().fieldErrors });
+      const fields = parsed.error.flatten().fieldErrors;
+      const msg = Object.entries(fields)
+        .map(([field, errs]) => `${field}: ${(errs as string[]).join(", ")}`)
+        .join("; ");
+      return res.status(400).json({ success: false, error: msg || "Invalid input" });
     }
     const token = req.headers.authorization!.slice(7);
     const userId = req.user!.id;
-    const { error: profileError } = await createProfile(token, userId, req.user!.email);
-    if (profileError && !profileError.includes("duplicate key")) {
-      return res.status(500).json({ success: false, error: profileError });
+
+    const existing = await getProfile(token, userId);
+    if (!existing.data && existing.error) {
+      return res.status(500).json({ success: false, error: existing.error });
+    }
+    if (!existing.data) {
+      const { error: profileError } = await createProfile(token, userId, req.user!.email);
+      if (profileError) {
+        return res.status(500).json({ success: false, error: profileError });
+      }
     }
 
     const { score_data, cover_letter, ...appData } = parsed.data;
@@ -151,7 +163,11 @@ router.put("/:id", async (req: Request, res: Response) => {
   try {
     const parsed = updateSchema.safeParse(req.body);
     if (!parsed.success) {
-      return res.status(400).json({ success: false, error: parsed.error.flatten().fieldErrors });
+      const fields = parsed.error.flatten().fieldErrors;
+      const msg = Object.entries(fields)
+        .map(([field, errs]) => `${field}: ${(errs as string[]).join(", ")}`)
+        .join("; ");
+      return res.status(400).json({ success: false, error: msg || "Invalid input" });
     }
     const token = req.headers.authorization!.slice(7);
     const id = req.params.id as string;

@@ -35,7 +35,7 @@ export async function generateCoverLetter(
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: buildCoverLetterPrompt(resumeText, jobDescription, company, role),
-      config: { maxOutputTokens: 2048 },
+      config: { maxOutputTokens: 8192 },
     });
 
     const text = response.text;

@@ -20,13 +20,15 @@ Required JSON structure — escape all quotes and newlines inside strings proper
   "pros": ["...", "..."],
   "cons": ["...", "..."],
   "missing_keywords": [{ "keyword": "...", "suggestion": "..." }],
-  "improvements": [{ "tag": "ADD", "text": "..." }],
+  "improvements": [{ "tag": "ADD" | "REPHRASE" | "FORMAT", "text": "..." }],
   "sample_resume_text": "rewritten resume here — escape all inner quotes with backslash, replace newlines with \\n"
 }
 
 Important: For sample_resume_text, use real info from the resume only.
 Escape all double quotes inside strings with backslash.
 Do not include actual newlines in JSON string values — use \\n instead.
+
+For improvements, tag must be exactly one of: ADD (missing content), REPHRASE (reword existing), FORMAT (structural fix). No other values are valid.
 
 RESUME:
 ${resumeText}

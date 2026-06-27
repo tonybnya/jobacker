@@ -6,6 +6,16 @@ import { generateCoverLetter } from "@/agent/cover-letter";
 import { generateTailoredResume } from "@/agent/resume-tailor";
 import { generatePdfBuffer } from "@/agent/pdf-generator";
 
+const VALID_TAGS = new Set(["ADD", "REPHRASE", "FORMAT"]);
+
+function normalizeTag(tag: string): "ADD" | "REPHRASE" | "FORMAT" {
+  if (VALID_TAGS.has(tag)) return tag as "ADD" | "REPHRASE" | "FORMAT";
+  const lower = tag.toLowerCase();
+  if (lower.includes("rephrase") || lower.includes("reword") || lower.includes("revis")) return "REPHRASE";
+  if (lower.includes("format") || lower.includes("restructur") || lower.includes("reorder")) return "FORMAT";
+  return "ADD";
+}
+
 const router = Router();
 
 router.use(requireAuth);
@@ -40,7 +50,7 @@ router.post("/preview-score", async (req: Request, res: Response) => {
         pros: scoreResult.result.pros,
         cons: scoreResult.result.cons,
         missing_keywords: scoreResult.result.missing_keywords,
-        improvements: scoreResult.result.improvements,
+        improvements: scoreResult.result.improvements.map((i) => ({ tag: normalizeTag(i.tag), text: i.text })),
         sample_resume_text: scoreResult.result.sample_resume_text,
       },
       cover_letter: coverLetterResult.success ? coverLetterResult.text : null,
@@ -98,7 +108,7 @@ router.post("/score", async (req: Request, res: Response) => {
       pros: result.pros,
       cons: result.cons,
       missing_keywords: result.missing_keywords,
-      improvements: result.improvements,
+      improvements: result.improvements.map((i) => ({ tag: normalizeTag(i.tag), text: i.text })),
       sample_resume_text: result.sample_resume_text,
       resume_text_used: profileResult.data.resume_text,
     };

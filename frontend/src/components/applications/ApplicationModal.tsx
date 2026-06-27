@@ -142,30 +142,36 @@ export function ApplicationModal({ open, onClose, onSave, application }: Applica
     }
     setSaving(true);
     setError(null);
-    const result = await onSave({
-      company: company.trim(),
-      role: role.trim(),
-      location: location.trim() || undefined,
-      type,
-      status,
-      date_applied: dateApplied,
-      job_url: jobUrl.trim() || undefined,
-      spy_status: spyStatus,
-      follow_up_count: followUpCount,
-      notes: notes.trim() || undefined,
-      job_description: jobDescription.trim() || undefined,
-      ...(scored && previewScore
-        ? {
-            score_data: previewScore,
-            cover_letter: previewCoverLetter || undefined,
-          }
-        : {}),
-    });
-    setSaving(false);
-    if (result) {
-      onClose();
-    } else {
-      setError("Failed to save application");
+    try {
+      const result = await onSave({
+        ...(application ?? {}),
+        company: company.trim(),
+        role: role.trim(),
+        location: location.trim() || undefined,
+        type,
+        status,
+        date_applied: dateApplied,
+        job_url: jobUrl.trim() || undefined,
+        spy_status: spyStatus,
+        follow_up_count: followUpCount,
+        notes: notes.trim() || undefined,
+        job_description: jobDescription.trim() || undefined,
+        ...(scored && previewScore
+          ? {
+              score_data: previewScore,
+              cover_letter: previewCoverLetter || undefined,
+            }
+          : {}),
+      });
+      setSaving(false);
+      if (result) {
+        onClose();
+      } else {
+        setError("Failed to save application");
+      }
+    } catch (err) {
+      setSaving(false);
+      setError(err instanceof Error ? err.message : "Failed to save application");
     }
   };
 
@@ -416,7 +422,7 @@ export function ApplicationModal({ open, onClose, onSave, application }: Applica
                   {previewCoverLetter && (
                     <div>
                       <p className="mb-1.5 text-[10px] font-mono font-medium text-text-muted">Cover Letter Preview</p>
-                      <p className="text-[11px] leading-relaxed text-text-dim line-clamp-3">{previewCoverLetter}</p>
+                      <p className="text-[11px] leading-relaxed text-text-dim">{previewCoverLetter}</p>
                     </div>
                   )}
                 </motion.div>

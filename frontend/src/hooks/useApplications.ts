@@ -86,8 +86,7 @@ export function useApplications(): UseApplicationsReturn {
       setVersion((v) => v + 1);
       return res.data;
     }
-    console.error("[useApplications] create failed:", res.error);
-    return null;
+    throw new Error(res.error ?? "Failed to save application");
   }, []);
 
   const updateApplication = useCallback(async (id: string, data: Partial<Application>) => {
@@ -99,7 +98,7 @@ export function useApplications(): UseApplicationsReturn {
       setVersion((v) => v + 1);
       return res.data;
     }
-    return null;
+    throw new Error(res.error ?? "Failed to update application");
   }, []);
 
   const deleteApplication = useCallback(async (id: string) => {

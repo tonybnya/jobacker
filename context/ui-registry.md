@@ -482,3 +482,34 @@ Used in: terminal block, score card mockup, and any live-status indicator.
 ```
 
 Always: 9px, font-mono, `text-amber`, `animate-pulse-amber`. Status text is always uppercase. The `●` bullet is always the content character, never an SVG or icon. Never use `text-gold` for status pills — amber only.
+
+---
+
+### DemoModal
+
+File: `src/components/landing/DemoModal.tsx`
+Last updated: 2026-06-29
+
+| Property        | Class / Value                                                                                     |
+| --------------- | ------------------------------------------------------------------------------------------------- |
+| Overlay         | `fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4`        |
+| Panel           | `relative w-full max-w-3xl rounded-2xl border border-border bg-bg p-8`                            |
+| Panel animation | Framer Motion: scale 0.9→1, opacity 0→1, y 20→0, spring damping 25 stiffness 300                  |
+| Close button    | `absolute top-4 right-4 w-8 h-8 rounded-full glass flex items-center justify-center text-text-muted hover:text-text` |
+| Progress dots   | Series of `h-1 rounded-full` — active dot `w-8 bg-amber`, inactive `w-2 bg-border`                |
+| Scene tag       | `text-[10px] font-mono tracking-widest text-amber`                                                |
+| Scene title     | `text-2xl font-light text-text` with `letterSpacing: '-0.02em'`                                   |
+| Scene content   | Centered with `flex flex-col items-center gap-6 min-h-[300px] justify-center`                     |
+| Progress bar    | `h-0.5 rounded-full bg-border overflow-hidden` with fill `bg-gradient-to-r from-amber to-gold`    |
+| Scene nav       | `text-[10px] font-mono text-text-muted` — dot count + skip link                                   |
+| Score ring      | 120×120px SVG ring, track `stroke="rgba(41,37,36,0.8)"` strokeWidth 8, fill amber, 87/100 value  |
+| Score bars      | 4 rows with `h-1.5 rounded-full bg-border` track, fill `bg-gradient-to-r from-amber to-gold`      |
+| Stat cards      | `glass rounded-xl px-5 py-4 text-center border border-border` — large gold value + mono label     |
+| Bar chart       | Vertical bars `bg-gradient-to-t from-amber to-gold` in `flex items-end gap-2 h-20`               |
+| Pipeline col    | `glass rounded-xl p-4 border border-border min-w-[130px]` — stage label in color + card items     |
+| Pipeline card   | `bg-[rgba(0,0,0,0.2)] rounded-lg p-2.5` with role/company/score bar                              |
+| Letter card     | `glass rounded-xl p-5 border border-border max-w-md` — generate pulse + body text + progress       |
+| Scene transition| Framer Motion: `AnimatePresence mode="wait"`, x 30→0, opacity 0→1, 0.3s                          |
+
+**Pattern notes:**
+The demo modal overlays the entire viewport with `z-[100]`. Clicking the backdrop closes it (overlay onClick). The modal auto-advances through 4 scenes with a 60ms progress interval that takes ~6s per scene, then has an 800ms pause before advancing. If the user clicks "Skip", the current scene's progress is immediately completed and the next scene starts. The progress bar acts as a timer that resets on each scene. All scene content is self-contained React components (ScoreScene, DashboardScene, PipelineScene, CoverLetterScene) rendered via `AnimatePresence` keyed on `sceneIdx` for smooth crossfade transitions.

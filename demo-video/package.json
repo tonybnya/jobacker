@@ -1,0 +1,11 @@
+{
+  "name": "jobacker-demo-video",
+  "type": "module",
+  "scripts": {
+    "build": "remotion render src/Root.tsx DemoVideo out/demo.mp4"
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "remotion": "^4.0.0"
+  }
+}

@@ -3,6 +3,7 @@ import { gsap } from 'gsap'
 import { AmbientCanvas } from './AmbientCanvas'
 import { HeroSketch } from './HeroSketch'
 import { TickerLine } from './TickerLine'
+import { DemoModal } from './DemoModal'
 
 const termLines = [
   { type: 'ok', text: 'Resume parsed → 2,847 tokens extracted' },
@@ -20,6 +21,7 @@ export function HeroSection() {
   const ctaRowRef = useRef<HTMLDivElement>(null)
   const terminalRef = useRef<HTMLDivElement>(null)
   const [visibleLines, setVisibleLines] = useState(0)
+  const [demoOpen, setDemoOpen] = useState(false)
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -97,7 +99,10 @@ export function HeroSection() {
                   Start tracking free{' '}
                   <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>
                 </a>
-                <button className="cursor-pointer flex items-center gap-2 text-xs font-mono text-text px-4 py-2.5 rounded-full glass hover:border-border-amber/30 transition-all">
+                <button
+                  onClick={() => setDemoOpen(true)}
+                  className="cursor-pointer flex items-center gap-2 text-xs font-mono text-text px-4 py-2.5 rounded-full glass hover:border-border-amber/30 transition-all"
+                >
                   <span className="w-4 h-4 rounded-full border border-text-muted flex items-center justify-center">
                     <span className="w-0 h-0 border-t-[3px] border-t-transparent border-b-[3px] border-b-transparent border-l-[5px] border-l-text ml-0.5" />
                   </span>
@@ -150,6 +155,7 @@ export function HeroSection() {
 
         <TickerLine />
       </div>
+      <DemoModal open={demoOpen} onClose={() => setDemoOpen(false)} />
     </section>
   )
 }

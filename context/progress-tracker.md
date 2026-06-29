@@ -114,3 +114,12 @@ Update this file after every completed feature. Any AI agent reading this should
 - useAuth not a React context provider (session can desync across tabs)
 - pdf-lib vs @react-pdf/renderer decision not made
 - SCORE_THRESHOLD constant imported nowhere (lint-only, no runtime impact)
+
+### 2026-06-29 — Demo modal + Remotion attempt
+
+- Tried to create a Remotion demo video (demo-video/ directory with Remotion 4 composition, 5-scene 30s video) but npm install for `@remotion/cli` and renderer packages kept timing out (likely network issue)
+- Pivoted to Framer Motion-based DemoModal component (`frontend/src/components/landing/DemoModal.tsx`) — animated overlay with 4 scenes showing: resume scoring (87/100 match ring + score bars), dashboard analytics (stat cards + bar chart), pipeline view (4-column Kanban), and AI cover letter generation (animated progress)
+- Wired DemoModal into HeroSection "See demo" button with `onClick={() => setDemoOpen(true)}`
+- Auto-advance timer (60ms tick, ~6s per scene, 800ms pause between scenes) with skip button
+- Framer Motion spring transitions on modal open/close, AnimatePresence crossfade between scenes
+- Imprinted DemoModal → ui-registry.md

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
-import { DashboardSquare01Icon, UserIcon, Folder01Icon, AnalysisTextLinkIcon, Logout05Icon } from 'hugeicons-react'
+import { DashboardSquare01Icon, UserIcon, Folder01Icon, Logout05Icon } from 'hugeicons-react'
 import logo from '@/assets/logo.png'
 
 export function LandingNav() {
@@ -68,13 +68,6 @@ export function LandingNav() {
               <UserIcon size={14} />
               Profile
             </Link>
-            {/* <Link */}
-            {/*   to="/applications" */}
-            {/*   className="flex items-center gap-1.5 rounded-full px-3 py-1.5 font-mono text-[11px] text-text-muted transition-colors hover:text-text" */}
-            {/* > */}
-            {/*   <AnalysisTextLinkIcon size={14} /> */}
-            {/*   Scores */}
-            {/* </Link> */}
             <button
               onClick={handleSignOut}
               className="cursor-pointer flex items-center gap-1.5 rounded-full px-3 py-1.5 font-mono text-[11px] text-text-muted transition-colors hover:text-text"

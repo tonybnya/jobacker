@@ -13,7 +13,7 @@ interface ApplicationInfoProps {
   onSave: (data: Partial<Application>) => Promise<void>;
 }
 
-export function ApplicationInfo({ application, onSave }: ApplicationInfoProps) {
+export function ApplicationInfo({ application, onSave: _onSave }: ApplicationInfoProps) {
   return (
     <div className="glass rounded-xl border border-border p-5">
       <h3 className="mb-4 text-xs font-medium text-text">Application Info</h3>

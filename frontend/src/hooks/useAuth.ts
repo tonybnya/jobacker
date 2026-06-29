@@ -34,7 +34,7 @@ export function useAuth() {
 
     const storedToken = localStorage.getItem("insforge_token");
     if (storedToken) {
-      const { data, error } = await apiFetch<{ user: User }>("/api/auth/session", {
+      const { data, error: _error } = await apiFetch<{ user: User }>("/api/auth/session", {
         method: "POST",
         headers: { Authorization: `Bearer ${storedToken}` },
       });

@@ -4,10 +4,10 @@ import type { ApplicationsFilters } from "@/hooks/useApplications";
 
 const STATUSES = ["all", "applied", "phone-screen", "interviewing", "offer", "rejected", "ghosted"] as const;
 const TYPES = ["all", "on-site", "remote", "hybrid", "part-time", "internship", "contract"] as const;
-const SORTS = [
+const SORTS: { value: string; label: string }[] = [
   { value: "newest", label: "Newest" },
   { value: "oldest", label: "Oldest" },
-] as const;
+];
 
 function Dropdown<T extends string>({
   value,

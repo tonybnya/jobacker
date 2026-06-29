@@ -35,7 +35,7 @@ interface PipelineViewProps {
   onEdit: (app: Application) => void;
 }
 
-export function PipelineView({ applications, onStatusChange, onEdit }: PipelineViewProps) {
+export function PipelineView({ applications, onStatusChange: _onStatusChange, onEdit }: PipelineViewProps) {
   const [dragId, setDragId] = useState<string | null>(null);
 
   const columns = COLUMNS.map((col) => ({

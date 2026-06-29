@@ -68,13 +68,13 @@ export function LandingNav() {
               <UserIcon size={14} />
               Profile
             </Link>
-            <Link
-              to="/applications"
-              className="flex items-center gap-1.5 rounded-full px-3 py-1.5 font-mono text-[11px] text-text-muted transition-colors hover:text-text"
-            >
-              <AnalysisTextLinkIcon size={14} />
-              Scores
-            </Link>
+            {/* <Link */}
+            {/*   to="/applications" */}
+            {/*   className="flex items-center gap-1.5 rounded-full px-3 py-1.5 font-mono text-[11px] text-text-muted transition-colors hover:text-text" */}
+            {/* > */}
+            {/*   <AnalysisTextLinkIcon size={14} /> */}
+            {/*   Scores */}
+            {/* </Link> */}
             <button
               onClick={handleSignOut}
               className="cursor-pointer flex items-center gap-1.5 rounded-full px-3 py-1.5 font-mono text-[11px] text-text-muted transition-colors hover:text-text"

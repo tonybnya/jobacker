@@ -11,3 +11,5 @@ wheels/
 opencode.json
 memory.md
 .insforge/
+
+tmux*
